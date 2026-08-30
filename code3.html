@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Personal OS - Notes</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;family=JetBrains+Mono:wght@500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "secondary-fixed": "#e9ddff",
+                        "inverse-primary": "#006c49",
+                        "on-secondary-fixed": "#23005c",
+                        "error": "#ffb4ab",
+                        "secondary-container": "#571bc1",
+                        "surface-bright": "#31394d",
+                        "on-error-container": "#ffdad6",
+                        "surface-container-highest": "#2d3449",
+                        "inverse-surface": "#dae2fd",
+                        "on-primary": "#003824",
+                        "on-primary-fixed-variant": "#005236",
+                        "surface": "#0b1326",
+                        "tertiary-fixed-dim": "#89ceff",
+                        "surface-container-low": "#131b2e",
+                        "surface-dim": "#0b1326",
+                        "tertiary-fixed": "#c9e6ff",
+                        "inverse-on-surface": "#283044",
+                        "on-secondary": "#3c0091",
+                        "surface-container": "#171f33",
+                        "on-error": "#690005",
+                        "primary-container": "#10b981",
+                        "background": "#0b1326",
+                        "on-tertiary": "#00344d",
+                        "primary-fixed-dim": "#4edea3",
+                        "on-primary-container": "#00422b",
+                        "primary-fixed": "#6ffbbe",
+                        "on-surface": "#dae2fd",
+                        "on-primary-fixed": "#002113",
+                        "tertiary-container": "#23acf1",
+                        "surface-container-lowest": "#060e20",
+                        "outline-variant": "#3c4a42",
+                        "on-secondary-container": "#c4abff",
+                        "primary": "#4edea3",
+                        "on-tertiary-fixed-variant": "#004c6e",
+                        "on-surface-variant": "#bbcabf",
+                        "error-container": "#93000a",
+                        "on-secondary-fixed-variant": "#5516be",
+                        "secondary": "#d0bcff",
+                        "surface-tint": "#4edea3",
+                        "surface-variant": "#2d3449",
+                        "tertiary": "#89ceff",
+                        "secondary-fixed-dim": "#d0bcff",
+                        "on-background": "#dae2fd",
+                        "outline": "#86948a",
+                        "surface-container-high": "#222a3d",
+                        "on-tertiary-container": "#003d59",
+                        "on-tertiary-fixed": "#001e2f"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "card-padding": "1.5rem",
+                        "grid-gap": "1rem",
+                        "container-padding": "2rem",
+                        "stack-compact": "0.5rem",
+                        "element-gap": "0.75rem"
+                    },
+                    "fontFamily": {
+                        "body-sm": ["Inter"],
+                        "label-caps": ["JetBrains Mono"],
+                        "stats-num": ["Inter"],
+                        "headline-sm": ["Inter"],
+                        "display-lg": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "headline-md": ["Inter"]
+                    },
+                    "fontSize": {
+                        "body-sm": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "label-caps": ["12px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "500" }],
+                        "stats-num": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "headline-sm": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "display-lg": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { background-color: theme('colors.background'); color: theme('colors.on-background'); }
+        .bento-card {
+            background-color: theme('colors.surface');
+            border: 1px solid theme('colors.outline-variant');
+            border-radius: theme('borderRadius.xl');
+            padding: theme('spacing.card-padding');
+            transition: border-color 0.2s ease;
+        }
+        .bento-card:hover {
+            border-color: theme('colors.primary');
+        }
+    </style>
+</head>
+<body class="flex bg-background text-on-background min-h-screen">
+<!-- SideNavBar -->
+<nav class="fixed left-0 top-0 h-screen w-64 bg-surface-container dark:bg-surface-container border-r border-outline-variant dark:border-outline-variant flex flex-col py-container-padding px-4 z-50">
+<div class="flex items-center gap-element-gap mb-8">
+<div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-on-primary font-bold">U</div>
+<div>
+<h1 class="font-headline-md text-headline-md font-bold text-primary dark:text-primary">Personal OS</h1>
+<p class="font-label-caps text-label-caps text-on-surface-variant">V 2.0.4</p>
+</div>
+</div>
+<button class="w-full mb-6 py-2 px-4 bg-surface-container-high rounded-lg text-left text-on-surface-variant hover:text-primary transition-colors flex justify-between items-center font-body-sm text-body-sm">
+            CMD+K Search <span class="material-symbols-outlined text-[16px]">search</span>
+</button>
+<div class="flex-1 flex flex-col gap-2">
+<a class="flex items-center gap-element-gap text-on-surface-variant dark:text-on-surface-variant px-3 py-2 hover:bg-surface-container-high dark:hover:bg-surface-container-high transition-colors rounded-lg font-label-caps text-label-caps" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+                Dashboard
+            </a>
+<a class="flex items-center gap-element-gap text-on-surface-variant dark:text-on-surface-variant px-3 py-2 hover:bg-surface-container-high dark:hover:bg-surface-container-high transition-colors rounded-lg font-label-caps text-label-caps" href="#">
+<span class="material-symbols-outlined">check_circle</span>
+                Tasks
+            </a>
+<a class="flex items-center gap-element-gap text-primary dark:text-primary bg-secondary-container/20 rounded-lg px-3 py-2 scale-[0.98] transition-transform duration-150 font-label-caps text-label-caps" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">description</span>
+                Notes
+            </a>
+<a class="flex items-center gap-element-gap text-on-surface-variant dark:text-on-surface-variant px-3 py-2 hover:bg-surface-container-high dark:hover:bg-surface-container-high transition-colors rounded-lg font-label-caps text-label-caps" href="#">
+<span class="material-symbols-outlined">published_with_changes</span>
+                Habits
+            </a>
+<a class="flex items-center gap-element-gap text-on-surface-variant dark:text-on-surface-variant px-3 py-2 hover:bg-surface-container-high dark:hover:bg-surface-container-high transition-colors rounded-lg font-label-caps text-label-caps" href="#">
+<span class="material-symbols-outlined">settings</span>
+                Systems
+            </a>
+</div>
+<div class="mt-auto flex flex-col gap-2 pt-4 border-t border-outline-variant">
+<a class="flex items-center gap-element-gap text-on-surface-variant dark:text-on-surface-variant px-3 py-2 hover:bg-surface-container-high dark:hover:bg-surface-container-high transition-colors rounded-lg font-label-caps text-label-caps" href="#">
+<span class="material-symbols-outlined">help_outline</span>
+                Support
+            </a>
+<a class="flex items-center gap-element-gap text-on-surface-variant dark:text-on-surface-variant px-3 py-2 hover:bg-surface-container-high dark:hover:bg-surface-container-high transition-colors rounded-lg font-label-caps text-label-caps" href="#">
+<span class="material-symbols-outlined">tune</span>
+                Settings
+            </a>
+</div>
+</nav>
+<!-- Main Content Area -->
+<main class="flex-1 ml-64 flex flex-col min-h-screen">
+<!-- TopAppBar -->
+<header class="sticky top-0 w-full bg-surface/80 backdrop-blur-md flex justify-between items-center h-16 px-container-padding z-40">
+<div class="flex items-center gap-6">
+<!-- Navigation Links -->
+<nav class="hidden md:flex items-center gap-6">
+<a class="text-on-surface-variant dark:text-on-surface-variant hover:text-primary transition-colors font-body-lg text-body-lg" href="#">Focus Mode</a>
+<a class="text-on-surface-variant dark:text-on-surface-variant hover:text-primary transition-colors font-body-lg text-body-lg" href="#">Weekly View</a>
+<a class="text-on-surface-variant dark:text-on-surface-variant hover:text-primary transition-colors font-body-lg text-body-lg" href="#">Analytics</a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<button class="bg-primary text-on-primary px-4 py-2 rounded-lg font-body-sm text-body-sm font-semibold hover:bg-primary-fixed transition-colors">
+                    Quick Add
+                </button>
+<div class="flex gap-2">
+<button class="text-on-surface-variant hover:text-primary transition-colors p-2 rounded-full hover:bg-surface-container">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="text-on-surface-variant hover:text-primary transition-colors p-2 rounded-full hover:bg-surface-container">
+<span class="material-symbols-outlined">calendar_today</span>
+</button>
+</div>
+</div>
+</header>
+<div class="p-container-padding flex-1 overflow-y-auto">
+<div class="max-w-7xl mx-auto space-y-8">
+<header class="mb-8">
+<h2 class="font-display-lg text-display-lg text-on-surface mb-2">Knowledge Library</h2>
+<p class="font-body-lg text-body-lg text-on-surface-variant">Track your reading, capture insights, and connect ideas.</p>
+</header>
+<div class="grid grid-cols-1 md:grid-cols-12 gap-grid-gap">
+<!-- Currently Reading - Large Bento -->
+<div class="bento-card md:col-span-8 flex flex-col gap-6">
+<div class="flex justify-between items-center">
+<h3 class="font-label-caps text-label-caps text-tertiary">CURRENTLY READING</h3>
+<span class="material-symbols-outlined text-tertiary">menu_book</span>
+</div>
+<div class="flex gap-6 items-start">
+<img class="w-32 h-48 object-cover rounded-lg shadow-lg border border-outline-variant" data-alt="A modern, minimalist book cover for a book about system thinking, featuring abstract geometric shapes in deep slate and vibrant emerald green, against a dark background. The design is clean, professional, and sophisticated, suited for a high-end personal management application." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDUE-jo4NGP0vPItlURcbBmeP6YQ2HEauvO1TYduxe23h1fMDC74GMEi0BXFWiuXXtbFbl83rWr7AWbgnEf978T4AeTqpZ3lSTo2dlOXYcosLIJQplZJUBjABUZU42AsT5yQh-fE1-YDWghdjVmh2uric_4DU2wOtHMW3xxg3vONBB2ShduAMZEKdISEcY5GSiluMe1GQthEib70So815tXwdP9z-mSTIcGC5CigAkTFu677uAexjeuFA"/>
+<div class="flex-1 flex flex-col gap-4">
+<div>
+<h4 class="font-headline-md text-headline-md text-on-surface">Thinking in Systems</h4>
+<p class="font-body-lg text-body-lg text-on-surface-variant">Donella H. Meadows</p>
+</div>
+<div>
+<div class="flex justify-between font-label-caps text-label-caps text-on-surface-variant mb-2">
+<span>Progress</span>
+<span>64%</span>
+</div>
+<div class="w-full h-2 bg-surface-container-high rounded-full overflow-hidden">
+<div class="h-full bg-tertiary rounded-full w-[64%]"></div>
+</div>
+</div>
+<div class="flex gap-2 flex-wrap mt-auto">
+<span class="px-2 py-1 rounded bg-surface-container text-on-surface-variant font-label-caps text-[10px]">#SYSTEMS</span>
+<span class="px-2 py-1 rounded bg-surface-container text-on-surface-variant font-label-caps text-[10px]">#NON-FICTION</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Quick Zettelkasten Entry -->
+<div class="bento-card md:col-span-4 flex flex-col gap-4">
+<div class="flex justify-between items-center">
+<h3 class="font-label-caps text-label-caps text-primary">QUICK NOTE</h3>
+<span class="material-symbols-outlined text-primary">edit_note</span>
+</div>
+<textarea class="w-full bg-surface-container-low border-b border-outline-variant focus:border-tertiary focus:ring-0 rounded-t-lg p-3 text-on-surface font-body-sm text-body-sm resize-none h-32" placeholder="Capture a fleeting thought..."></textarea>
+<div class="flex justify-between items-center mt-auto">
+<span class="font-label-caps text-label-caps text-on-surface-variant">ID: 20231024-1422</span>
+<button class="bg-primary/10 text-primary hover:bg-primary/20 px-3 py-1.5 rounded-lg font-label-caps text-label-caps transition-colors">Save</button>
+</div>
+</div>
+<!-- Book Shelf Grid -->
+<div class="md:col-span-12">
+<h3 class="font-headline-sm text-headline-sm text-on-surface mb-4 mt-4">Up Next</h3>
+<div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+<!-- Book 1 -->
+<div class="bento-card p-4 flex flex-col gap-3 group cursor-pointer">
+<div class="relative w-full aspect-[2/3] rounded-lg overflow-hidden border border-outline-variant group-hover:border-primary transition-colors">
+<div class="bg-cover bg-center w-full h-full" data-alt="A striking minimalist digital illustration of a brain composed of glowing nodes and connections on a dark navy background. High-key cyan and emerald accents suggest advanced learning and neuroplasticity. Professional, sleek, modern aesthetics." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAVpxejzetrA4TwSEHr4cSvCHXxYKWo1vITHZJpKqZ-Xtk2FrkYGMEQ73rCKnGe3owBUwqMHduat-LPtwUCgGs-DWu-O0tLtibsGlFnVygFA0Ha6a6LueFXxaR73-KMq2WrAlpnmA1DOANFHPzEEXNbUMC-mgXxGokgf3ZOmSysPHQ6d28eTHDQDQFbeD8-gZifXXnIF9wVj25gdmuRGCb3-TXiFWtBjQv6QX00cN8KGUZfI9bsZsvlTQ')"></div>
+</div>
+<div>
+<h4 class="font-body-sm text-body-sm font-semibold text-on-surface truncate">Deep Work</h4>
+<p class="font-label-caps text-label-caps text-on-surface-variant truncate">Cal Newport</p>
+</div>
+<div class="flex items-center gap-1 text-tertiary">
+<span class="material-symbols-outlined text-[14px]">sticky_note_2</span>
+<span class="font-label-caps text-[10px]">12 NOTES</span>
+</div>
+</div>
+<!-- Book 2 -->
+<div class="bento-card p-4 flex flex-col gap-3 group cursor-pointer">
+<div class="relative w-full aspect-[2/3] rounded-lg overflow-hidden border border-outline-variant group-hover:border-primary transition-colors">
+<div class="bg-cover bg-center w-full h-full" data-alt="A modern abstract geometric design representing atomic structures and habits. Tiny glowing emerald spheres connected by thin bright lines against a deep space slate background. Clean, purposeful, and minimalist digital art style." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDAMQFqQzOSzMSGX31OkKG6HwHacvNnMSa6JJr1HB7mkEjwOl_qxdk_lgnnVFY-V_xsh8CEYF6wDbbISUpOBTsBKMfDHSpZDxCJOqj797QnB_84GsdrcUoXcQR4igL-mrzZnhw37X7cWyhagXNMAaJOPk1wzjpervi8g1Oc9VYFyEQR7DUDDWo6Icnw0xtOlPscMAlNjBYIHDk9DH2me3AxdF4cMKU48WeMYdUzJzOWMPbrgotP4uYoUg')"></div>
+</div>
+<div>
+<h4 class="font-body-sm text-body-sm font-semibold text-on-surface truncate">Atomic Habits</h4>
+<p class="font-label-caps text-label-caps text-on-surface-variant truncate">James Clear</p>
+</div>
+<div class="flex items-center gap-1 text-tertiary">
+<span class="material-symbols-outlined text-[14px]">sticky_note_2</span>
+<span class="font-label-caps text-[10px]">45 NOTES</span>
+</div>
+</div>
+<!-- Book 3 -->
+<div class="bento-card p-4 flex flex-col gap-3 group cursor-pointer">
+<div class="relative w-full aspect-[2/3] rounded-lg overflow-hidden border border-outline-variant group-hover:border-primary transition-colors">
+<div class="bg-cover bg-center w-full h-full" data-alt="A sleek, minimalist digital illustration of an hourglass where the sand forms complex data patterns. Deep slate background with vibrant sky blue and bright emerald accents. Professional, modern, and highly polished aesthetic." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAVWXs2aLgctKrRngIWt1FzQzClFxqjf9qLUJR1SBl1aDhJNnWnaUzOJDeWOylCD4Jas3MQ6P103Dd7zeqK5ra0iV09ycDKY-9Y0hTjqyUCrInYEpGEU1T6hX1zzksk-ZHKAVHIPkVgN0hCgn7MypWo2dECRbTmDm9YG5fQVvwOdgyePZ-LkREtjxh1p3ikQBPpzMxlPyLNu0mqsdF78ndO39UoyNKzZ2jq4cKQPscamsY6DYg8smz7nQ')"></div>
+</div>
+<div>
+<h4 class="font-body-sm text-body-sm font-semibold text-on-surface truncate">Essentialism</h4>
+<p class="font-label-caps text-label-caps text-on-surface-variant truncate">Greg McKeown</p>
+</div>
+<div class="flex items-center gap-1 text-tertiary">
+<span class="material-symbols-outlined text-[14px]">sticky_note_2</span>
+<span class="font-label-caps text-[10px]">8 NOTES</span>
+</div>
+</div>
+<!-- Book 4 -->
+<div class="bento-card p-4 flex flex-col gap-3 group cursor-pointer">
+<div class="relative w-full aspect-[2/3] rounded-lg overflow-hidden border border-outline-variant group-hover:border-primary transition-colors">
+<div class="bg-cover bg-center w-full h-full" data-alt="A minimalist digital painting of a solitary figure standing on a glowing geometrical path in a vast dark void. The path is illuminated in soft emerald green. Calm, reflective, modern minimalist aesthetic suitable for a philosophy book cover." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAYxhu535w4uLq-PtYVZilepxyh8q_qTEggawrDF0-WoXSvKb1ldSx-Jpy_r29IeEnekFwVfWiQOtjueNjvFwgAI7rqVFna8C-r5EYvg1xBAK8er6yG-lIQN07kImtUuyQEzZevaCjrDlkRi_6H-NWbKW03KKP_-AQaFornLXV7cMPAHHcgK4hA99Dp-wmqXsgf0CXayZLr0t1W51kjosYJzl0be0V2FrYmq_qdjoJp1pJU5Kyd87_3VA')"></div>
+</div>
+<div>
+<h4 class="font-body-sm text-body-sm font-semibold text-on-surface truncate">Meditations</h4>
+<p class="font-label-caps text-label-caps text-on-surface-variant truncate">Marcus Aurelius</p>
+</div>
+<div class="flex items-center gap-1 text-tertiary">
+<span class="material-symbols-outlined text-[14px]">sticky_note_2</span>
+<span class="font-label-caps text-[10px]">0 NOTES</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Highlighted Quote -->
+<div class="bento-card md:col-span-12 relative overflow-hidden group">
+<div class="absolute top-0 right-0 p-8 opacity-10 group-hover:opacity-20 transition-opacity">
+<span class="material-symbols-outlined text-9xl text-primary">format_quote</span>
+</div>
+<div class="relative z-10 p-4">
+<h3 class="font-label-caps text-label-caps text-secondary mb-4">RESONANT HIGHLIGHT</h3>
+<blockquote class="font-headline-md text-headline-md text-on-surface italic mb-4 max-w-4xl leading-relaxed">
+                                "A system is more than the sum of its parts. It may exhibit dynamic, adaptive, goal-seeking, self-preserving, and sometimes evolutionary behavior."
+                            </blockquote>
+<p class="font-body-sm text-body-sm text-on-surface-variant">— Donella H. Meadows, <cite>Thinking in Systems</cite></p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+</body></html>

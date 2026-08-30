@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Personal OS - Habits &amp; Rhythm</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;family=JetBrains+Mono:wght@500&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        "colors": {
+                "primary": "#4edea3",
+                "tertiary-fixed": "#ffdad7",
+                "surface-variant": "#2d3449",
+                "on-tertiary-fixed": "#410005",
+                "primary-fixed-dim": "#4edea3",
+                "error-red": "#EF4444",
+                "on-background": "#dae2fd",
+                "secondary-fixed": "#e9ddff",
+                "secondary-fixed-dim": "#d0bcff",
+                "outline": "#86948a",
+                "outline-light": "#E2E8F0",
+                "on-surface": "#dae2fd",
+                "outline-variant": "#3c4a42",
+                "surface-container-highest": "#2d3449",
+                "on-tertiary": "#650911",
+                "tertiary-container": "#fc7c78",
+                "on-primary-fixed": "#002113",
+                "inverse-primary": "#006c49",
+                "inverse-surface": "#dae2fd",
+                "on-primary-fixed-variant": "#005236",
+                "on-surface-variant": "#bbcabf",
+                "on-error": "#690005",
+                "surface-dim": "#0b1326",
+                "on-secondary-container": "#c4abff",
+                "surface-light": "#F8FAFC",
+                "on-error-container": "#ffdad6",
+                "error": "#ffb4ab",
+                "surface-bright": "#31394d",
+                "surface-tint": "#4edea3",
+                "on-secondary-fixed": "#23005c",
+                "inverse-on-surface": "#283044",
+                "primary-container": "#10b981",
+                "tertiary-fixed-dim": "#ffb3af",
+                "on-tertiary-fixed-variant": "#842225",
+                "on-secondary": "#3c0091",
+                "surface-container-low": "#131b2e",
+                "tertiary-sky": "#0EA5E9",
+                "surface-container-high": "#222a3d",
+                "background": "#0b1326",
+                "surface": "#0b1326",
+                "on-primary": "#003824",
+                "tertiary": "#ffb3af",
+                "surface-container": "#171f33",
+                "on-tertiary-container": "#711419",
+                "surface-container-light": "#FFFFFF",
+                "on-secondary-fixed-variant": "#5516be",
+                "primary-fixed": "#6ffbbe",
+                "secondary-container": "#571bc1",
+                "surface-container-lowest": "#060e20",
+                "secondary": "#d0bcff",
+                "on-primary-container": "#00422b",
+                "error-container": "#93000a"
+        },
+        "borderRadius": {
+                "DEFAULT": "0.25rem",
+                "lg": "0.5rem",
+                "xl": "0.75rem",
+                "full": "9999px"
+        },
+        "spacing": {
+                "element-gap": "0.75rem",
+                "margin-desktop": "2rem",
+                "base": "8px",
+                "margin-mobile": "1rem",
+                "card-padding": "1.5rem",
+                "gutter": "1rem",
+                "grid-gap": "1rem",
+                "container-padding": "2rem",
+                "stack-compact": "0.5rem"
+        },
+        "fontFamily": {
+                "stats-num": [
+                        "Inter"
+                ],
+                "display-lg": [
+                        "Inter"
+                ],
+                "display-lg-mobile": [
+                        "Inter"
+                ],
+                "headline-sm": [
+                        "Inter"
+                ],
+                "body-sm": [
+                        "Inter"
+                ],
+                "body-lg": [
+                        "Inter"
+                ],
+                "headline-md": [
+                        "Inter"
+                ],
+                "label-caps": [
+                        "JetBrains Mono"
+                ]
+        },
+        "fontSize": {
+                "stats-num": [
+                        "32px",
+                        {
+                                "lineHeight": "40px",
+                                "letterSpacing": "-0.02em",
+                                "fontWeight": "700"
+                        }
+                ],
+                "display-lg": [
+                        "48px",
+                        {
+                                "lineHeight": "56px",
+                                "letterSpacing": "-0.02em",
+                                "fontWeight": "700"
+                        }
+                ],
+                "display-lg-mobile": [
+                        "32px",
+                        {
+                                "lineHeight": "40px",
+                                "letterSpacing": "-0.02em",
+                                "fontWeight": "700"
+                        }
+                ],
+                "headline-sm": [
+                        "20px",
+                        {
+                                "lineHeight": "28px",
+                                "fontWeight": "600"
+                        }
+                ],
+                "body-sm": [
+                        "14px",
+                        {
+                                "lineHeight": "20px",
+                                "fontWeight": "400"
+                        }
+                ],
+                "body-lg": [
+                        "16px",
+                        {
+                                "lineHeight": "24px",
+                                "fontWeight": "400"
+                        }
+                ],
+                "headline-md": [
+                        "24px",
+                        {
+                                "lineHeight": "32px",
+                                "letterSpacing": "-0.01em",
+                                "fontWeight": "600"
+                        }
+                ],
+                "label-caps": [
+                        "12px",
+                        {
+                                "lineHeight": "16px",
+                                "letterSpacing": "0.05em",
+                                "fontWeight": "500"
+                        }
+                ]
+        }
+},
+    },
+  }
+</script>
+<style>
+        body { background-color: theme('colors.background'); color: theme('colors.on-background'); }
+        .bento-card {
+            background-color: theme('colors.surface-container-low');
+            border: 1px solid theme('colors.outline-variant');
+            border-radius: theme('borderRadius.xl');
+            padding: theme('spacing.card-padding');
+            transition: border-color 0.2s ease;
+        }
+        .bento-card:hover {
+            border-color: theme('colors.primary');
+        }
+        
+        /* Heatmap Grid */
+        .heatmap-grid {
+            display: grid;
+            grid-template-rows: repeat(7, 1fr);
+            grid-auto-flow: column;
+            gap: 4px;
+        }
+        .heatmap-cell {
+            width: 12px;
+            height: 12px;
+            border-radius: 2px;
+            background-color: theme('colors.surface-container-highest');
+            transition: all 0.3s ease;
+        }
+        .heatmap-cell[data-level="1"] { background-color: rgba(78, 222, 163, 0.2); }
+        .heatmap-cell[data-level="2"] { background-color: rgba(78, 222, 163, 0.5); }
+        .heatmap-cell[data-level="3"] { 
+            background-color: rgba(78, 222, 163, 0.8); 
+            box-shadow: 0 0 4px rgba(78, 222, 163, 0.5);
+        }
+        .heatmap-cell[data-level="4"] { 
+            background-color: theme('colors.primary'); 
+            box-shadow: 0 0 8px theme('colors.primary');
+        }
+
+        .habit-checkbox {
+            appearance: none;
+            width: 24px;
+            height: 24px;
+            border: 2px solid theme('colors.outline-variant');
+            border-radius: theme('borderRadius.DEFAULT');
+            background-color: theme('colors.surface-container');
+            cursor: pointer;
+            position: relative;
+            transition: all 0.2s ease;
+        }
+        .habit-checkbox:checked {
+            background: linear-gradient(135deg, theme('colors.primary'), theme('colors.primary-fixed-dim'));
+            border-color: transparent;
+            transform: scale(1.05);
+            box-shadow: 0 0 8px rgba(78, 222, 163, 0.4);
+        }
+        .habit-checkbox:checked::after {
+            content: '';
+            position: absolute;
+            top: 4px;
+            left: 8px;
+            width: 5px;
+            height: 10px;
+            border: solid theme('colors.on-primary');
+            border-width: 0 2px 2px 0;
+            transform: rotate(45deg);
+        }
+    </style>
+</head>
+<body class="flex h-screen overflow-hidden">
+<!-- SideNavBar -->
+<nav class="bg-surface-container dark:bg-surface-container fixed left-0 top-0 h-screen w-64 border-r border-outline-variant dark:border-outline-variant flex flex-col py-container-padding px-4 z-20">
+<div class="mb-8 px-3 flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-primary-container flex items-center justify-center text-on-primary-container font-bold">U</div>
+<div>
+<h1 class="font-headline-md text-headline-md font-bold text-primary dark:text-primary">Personal OS</h1>
+<p class="font-label-caps text-label-caps text-on-surface-variant text-[10px]">V 2.0.4</p>
+</div>
+</div>
+<div class="flex-1 space-y-1">
+<a class="flex items-center gap-element-gap text-on-surface-variant dark:text-on-surface-variant px-3 py-2 hover:bg-surface-container-high dark:hover:bg-surface-container-high transition-colors rounded-lg" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-label-caps text-label-caps">Dashboard</span>
+</a>
+<a class="flex items-center gap-element-gap text-on-surface-variant dark:text-on-surface-variant px-3 py-2 hover:bg-surface-container-high dark:hover:bg-surface-container-high transition-colors rounded-lg" href="#">
+<span class="material-symbols-outlined">check_circle</span>
+<span class="font-label-caps text-label-caps">Tasks</span>
+</a>
+<a class="flex items-center gap-element-gap text-on-surface-variant dark:text-on-surface-variant px-3 py-2 hover:bg-surface-container-high dark:hover:bg-surface-container-high transition-colors rounded-lg" href="#">
+<span class="material-symbols-outlined">description</span>
+<span class="font-label-caps text-label-caps">Notes</span>
+</a>
+<a class="flex items-center gap-element-gap text-primary dark:text-primary bg-secondary-container/20 rounded-lg px-3 py-2 scale-[0.98] transition-transform duration-150" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">published_with_changes</span>
+<span class="font-label-caps text-label-caps">Habits</span>
+</a>
+<a class="flex items-center gap-element-gap text-on-surface-variant dark:text-on-surface-variant px-3 py-2 hover:bg-surface-container-high dark:hover:bg-surface-container-high transition-colors rounded-lg" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-label-caps text-label-caps">Systems</span>
+</a>
+</div>
+<div class="mt-auto space-y-1 pt-4 border-t border-outline-variant">
+<div class="px-3 py-2 text-on-surface-variant text-xs flex items-center justify-between opacity-50 mb-2">
+<span>Search</span>
+<span class="font-mono bg-surface-container-high px-1.5 py-0.5 rounded">CMD+K</span>
+</div>
+<a class="flex items-center gap-element-gap text-on-surface-variant dark:text-on-surface-variant px-3 py-2 hover:bg-surface-container-high dark:hover:bg-surface-container-high transition-colors rounded-lg" href="#">
+<span class="material-symbols-outlined">help_outline</span>
+<span class="font-label-caps text-label-caps">Support</span>
+</a>
+<a class="flex items-center gap-element-gap text-on-surface-variant dark:text-on-surface-variant px-3 py-2 hover:bg-surface-container-high dark:hover:bg-surface-container-high transition-colors rounded-lg" href="#">
+<span class="material-symbols-outlined">tune</span>
+<span class="font-label-caps text-label-caps">Settings</span>
+</a>
+</div>
+</nav>
+<!-- Main Content Area -->
+<main class="flex-1 ml-64 flex flex-col h-full overflow-y-auto bg-background">
+<!-- TopAppBar -->
+<header class="bg-surface/80 backdrop-blur-md sticky top-0 w-full z-10 flex justify-between items-center h-16 px-container-padding">
+<div class="flex items-center gap-6">
+<div class="relative text-on-surface-variant">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-sm">search</span>
+<input class="bg-surface-container border-none rounded-full py-1.5 pl-9 pr-4 text-sm focus:ring-1 focus:ring-primary outline-none w-64 text-on-surface transition-all placeholder:text-on-surface-variant/50" placeholder="Search..." type="text"/>
+</div>
+<nav class="hidden md:flex items-center gap-6">
+<a class="text-on-surface-variant dark:text-on-surface-variant font-body-sm text-body-sm hover:text-primary transition-colors" href="#">Focus Mode</a>
+<a class="text-on-surface-variant dark:text-on-surface-variant font-body-sm text-body-sm hover:text-primary transition-colors" href="#">Weekly View</a>
+<a class="text-on-surface-variant dark:text-on-surface-variant font-body-sm text-body-sm hover:text-primary transition-colors" href="#">Analytics</a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<button class="text-on-surface-variant hover:text-primary transition-colors p-2 rounded-full hover:bg-surface-container-high">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="text-on-surface-variant hover:text-primary transition-colors p-2 rounded-full hover:bg-surface-container-high">
+<span class="material-symbols-outlined">calendar_today</span>
+</button>
+<button class="bg-primary text-on-primary px-4 py-1.5 rounded-full font-label-caps text-label-caps hover:bg-primary-fixed-dim transition-colors flex items-center gap-2 shadow-[0_0_15px_rgba(78,222,163,0.3)]">
+<span class="material-symbols-outlined text-[16px]">add</span> Quick Add
+                </button>
+</div>
+</header>
+<!-- Bento Grid Content -->
+<div class="p-container-padding">
+<div class="mb-8">
+<h2 class="font-display-lg text-display-lg text-on-surface mb-2">Rhythm &amp; Discipline</h2>
+<p class="font-body-lg text-body-lg text-on-surface-variant">Track your consistency and build momentum.</p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-12 gap-grid-gap">
+<!-- Heatmap (Spans 12 columns) -->
+<div class="bento-card md:col-span-12 flex flex-col gap-4">
+<div class="flex justify-between items-center mb-2">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">calendar_month</span>
+<span class="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-wider">Annual Discipline</span>
+</div>
+<div class="font-stats-num text-stats-num text-on-surface">248 <span class="text-sm font-normal text-on-surface-variant">days active</span></div>
+</div>
+<div class="overflow-x-auto pb-2 custom-scrollbar">
+<div class="heatmap-grid" id="heatmap-container">
+<!-- Populated by JS -->
+</div>
+</div>
+<div class="flex justify-end items-center gap-2 mt-2 text-xs text-on-surface-variant">
+<span>Less</span>
+<div class="w-3 h-3 rounded-sm bg-surface-container-highest"></div>
+<div class="w-3 h-3 rounded-sm bg-primary/20"></div>
+<div class="w-3 h-3 rounded-sm bg-primary/50"></div>
+<div class="w-3 h-3 rounded-sm bg-primary/80 shadow-[0_0_4px_rgba(78,222,163,0.5)]"></div>
+<div class="w-3 h-3 rounded-sm bg-primary shadow-[0_0_8px_rgba(78,222,163,1)]"></div>
+<span>More</span>
+</div>
+</div>
+<!-- Rhythm Metrics (Spans 4 columns) -->
+<div class="bento-card md:col-span-4 flex flex-col justify-between">
+<div>
+<div class="flex items-center gap-2 mb-6">
+<span class="material-symbols-outlined text-secondary">trending_up</span>
+<span class="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-wider">Current Rhythm</span>
+</div>
+<div class="space-y-6">
+<div>
+<p class="text-sm text-on-surface-variant mb-1">Longest Streak</p>
+<p class="font-stats-num text-stats-num text-secondary shadow-secondary drop-shadow-[0_0_8px_rgba(208,188,255,0.4)]">42 <span class="text-sm font-normal">days</span></p>
+</div>
+<div>
+<p class="text-sm text-on-surface-variant mb-1">Weekly Completion</p>
+<div class="flex items-center gap-3">
+<p class="font-stats-num text-stats-num text-on-surface">85%</p>
+<div class="flex-1 h-2 bg-surface-container-high rounded-full overflow-hidden">
+<div class="h-full bg-secondary rounded-full w-[85%] shadow-[0_0_8px_rgba(208,188,255,0.8)]"></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="mt-8 pt-4 border-t border-outline-variant/30">
+<p class="font-body-sm text-body-sm text-on-surface-variant italic">"Discipline equals freedom."</p>
+</div>
+</div>
+<!-- Habits List (Spans 8 columns) -->
+<div class="bento-card md:col-span-8">
+<div class="flex justify-between items-center mb-6">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">checklist</span>
+<span class="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-wider">Daily Habits</span>
+</div>
+<button class="text-on-surface-variant hover:text-primary transition-colors text-sm flex items-center gap-1">
+<span class="material-symbols-outlined text-sm">edit</span> Edit
+                        </button>
+</div>
+<div class="space-y-4">
+<!-- Habit 1 -->
+<div class="bg-surface-container border border-outline-variant/50 p-4 rounded-lg flex items-center gap-4 hover:border-primary/50 transition-colors group">
+<input checked="" class="habit-checkbox" type="checkbox"/>
+<div class="flex-1">
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Morning Workout</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">45 mins strength or cardio</p>
+</div>
+<div class="text-right">
+<p class="font-label-caps text-label-caps text-primary mb-1 drop-shadow-[0_0_4px_rgba(78,222,163,0.5)]">28/30 Days</p>
+<div class="flex gap-1">
+<div class="w-6 h-1 bg-primary rounded-full shadow-[0_0_4px_rgba(78,222,163,0.8)]"></div>
+<div class="w-6 h-1 bg-primary rounded-full shadow-[0_0_4px_rgba(78,222,163,0.8)]"></div>
+<div class="w-6 h-1 bg-primary rounded-full shadow-[0_0_4px_rgba(78,222,163,0.8)]"></div>
+<div class="w-6 h-1 bg-primary rounded-full shadow-[0_0_4px_rgba(78,222,163,0.8)]"></div>
+<div class="w-6 h-1 bg-primary rounded-full shadow-[0_0_4px_rgba(78,222,163,0.8)]"></div>
+<div class="w-6 h-1 bg-surface-container-high rounded-full"></div>
+<div class="w-6 h-1 bg-primary rounded-full shadow-[0_0_4px_rgba(78,222,163,0.8)]"></div>
+</div>
+</div>
+</div>
+<!-- Habit 2 -->
+<div class="bg-surface-container border border-outline-variant/50 p-4 rounded-lg flex items-center gap-4 hover:border-primary/50 transition-colors group">
+<input class="habit-checkbox" type="checkbox"/>
+<div class="flex-1">
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Deep Work Block</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">2 hours uninterrupted</p>
+</div>
+<div class="text-right">
+<p class="font-label-caps text-label-caps text-secondary mb-1 drop-shadow-[0_0_4px_rgba(208,188,255,0.5)]">15/30 Days</p>
+<div class="flex gap-1">
+<div class="w-6 h-1 bg-secondary rounded-full shadow-[0_0_4px_rgba(208,188,255,0.8)]"></div>
+<div class="w-6 h-1 bg-secondary rounded-full shadow-[0_0_4px_rgba(208,188,255,0.8)]"></div>
+<div class="w-6 h-1 bg-surface-container-high rounded-full"></div>
+<div class="w-6 h-1 bg-secondary rounded-full shadow-[0_0_4px_rgba(208,188,255,0.8)]"></div>
+<div class="w-6 h-1 bg-surface-container-high rounded-full"></div>
+<div class="w-6 h-1 bg-surface-container-high rounded-full"></div>
+<div class="w-6 h-1 bg-surface-container-high rounded-full"></div>
+</div>
+</div>
+</div>
+<!-- Habit 3 -->
+<div class="bg-surface-container border border-outline-variant/50 p-4 rounded-lg flex items-center gap-4 hover:border-primary/50 transition-colors group">
+<input checked="" class="habit-checkbox" type="checkbox"/>
+<div class="flex-1">
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Read</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">10 pages minimum</p>
+</div>
+<div class="text-right">
+<p class="font-label-caps text-label-caps text-primary mb-1 drop-shadow-[0_0_4px_rgba(78,222,163,0.5)]">22/30 Days</p>
+<div class="flex gap-1">
+<div class="w-6 h-1 bg-primary rounded-full shadow-[0_0_4px_rgba(78,222,163,0.8)]"></div>
+<div class="w-6 h-1 bg-primary rounded-full shadow-[0_0_4px_rgba(78,222,163,0.8)]"></div>
+<div class="w-6 h-1 bg-primary rounded-full shadow-[0_0_4px_rgba(78,222,163,0.8)]"></div>
+<div class="w-6 h-1 bg-surface-container-high rounded-full"></div>
+<div class="w-6 h-1 bg-primary rounded-full shadow-[0_0_4px_rgba(78,222,163,0.8)]"></div>
+<div class="w-6 h-1 bg-primary rounded-full shadow-[0_0_4px_rgba(78,222,163,0.8)]"></div>
+<div class="w-6 h-1 bg-primary rounded-full shadow-[0_0_4px_rgba(78,222,163,0.8)]"></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<script>
+        // Generate random heatmap data for demonstration
+        const container = document.getElementById('heatmap-container');
+        const numColumns = 52; // roughly a year
+        
+        for (let col = 0; col < numColumns; col++) {
+            for (let row = 0; row < 7; row++) {
+                const cell = document.createElement('div');
+                cell.className = 'heatmap-cell';
+                
+                // Randomize levels, weighting towards some activity
+                const rand = Math.random();
+                let level = 0;
+                if (rand > 0.8) level = 4;
+                else if (rand > 0.6) level = 3;
+                else if (rand > 0.4) level = 2;
+                else if (rand > 0.2) level = 1;
+                
+                // Leave some empty space for realism
+                if (col < 5 || col > 48) level = Math.floor(Math.random() * 2);
+
+                cell.setAttribute('data-level', level);
+                
+                // Add tooltip-like title
+                const date = new Date();
+                date.setDate(date.getDate() - ((numColumns - col - 1) * 7 + (6 - row)));
+                cell.title = `${level} activities on ${date.toDateString()}`;
+                
+                container.appendChild(cell);
+            }
+        }
+        
+        // Add smooth scroll styling to scrollbar
+        const style = document.createElement('style');
+        style.innerHTML = `
+            .custom-scrollbar::-webkit-scrollbar {
+                height: 6px;
+            }
+            .custom-scrollbar::-webkit-scrollbar-track {
+                background: ${tailwind.config.theme.extend.colors['surface-container-high']};
+                border-radius: 4px;
+            }
+            .custom-scrollbar::-webkit-scrollbar-thumb {
+                background: ${tailwind.config.theme.extend.colors['outline-variant']};
+                border-radius: 4px;
+            }
+            .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+                background: ${tailwind.config.theme.extend.colors['primary/50']};
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body></html>

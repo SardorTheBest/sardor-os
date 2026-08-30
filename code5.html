@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Personal OS - Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;family=JetBrains+Mono:wght@500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "secondary-fixed": "#e9ddff",
+                      "inverse-primary": "#006c49",
+                      "on-secondary-fixed": "#23005c",
+                      "error": "#ffb4ab",
+                      "secondary-container": "#571bc1",
+                      "surface-bright": "#31394d",
+                      "on-error-container": "#ffdad6",
+                      "surface-container-highest": "#2d3449",
+                      "inverse-surface": "#dae2fd",
+                      "on-primary": "#003824",
+                      "on-primary-fixed-variant": "#005236",
+                      "surface": "#0b1326",
+                      "tertiary-fixed-dim": "#89ceff",
+                      "surface-container-low": "#131b2e",
+                      "surface-dim": "#0b1326",
+                      "tertiary-fixed": "#c9e6ff",
+                      "inverse-on-surface": "#283044",
+                      "on-secondary": "#3c0091",
+                      "surface-container": "#171f33",
+                      "on-error": "#690005",
+                      "primary-container": "#10b981",
+                      "background": "#0b1326",
+                      "on-tertiary": "#00344d",
+                      "primary-fixed-dim": "#4edea3",
+                      "on-primary-container": "#00422b",
+                      "primary-fixed": "#6ffbbe",
+                      "on-surface": "#dae2fd",
+                      "on-primary-fixed": "#002113",
+                      "tertiary-container": "#23acf1",
+                      "surface-container-lowest": "#060e20",
+                      "outline-variant": "#3c4a42",
+                      "on-secondary-container": "#c4abff",
+                      "primary": "#4edea3",
+                      "on-tertiary-fixed-variant": "#004c6e",
+                      "on-surface-variant": "#bbcabf",
+                      "error-container": "#93000a",
+                      "on-secondary-fixed-variant": "#5516be",
+                      "secondary": "#d0bcff",
+                      "surface-tint": "#4edea3",
+                      "surface-variant": "#2d3449",
+                      "tertiary": "#89ceff",
+                      "secondary-fixed-dim": "#d0bcff",
+                      "on-background": "#dae2fd",
+                      "outline": "#86948a",
+                      "surface-container-high": "#222a3d",
+                      "on-tertiary-container": "#003d59",
+                      "on-tertiary-fixed": "#001e2f"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "card-padding": "1.5rem",
+                      "grid-gap": "1rem",
+                      "container-padding": "2rem",
+                      "stack-compact": "0.5rem",
+                      "element-gap": "0.75rem"
+              },
+              "fontFamily": {
+                      "body-sm": [
+                              "Inter"
+                      ],
+                      "label-caps": [
+                              "JetBrains Mono"
+                      ],
+                      "stats-num": [
+                              "Inter"
+                      ],
+                      "headline-sm": [
+                              "Inter"
+                      ],
+                      "display-lg": [
+                              "Inter"
+                      ],
+                      "body-lg": [
+                              "Inter"
+                      ],
+                      "headline-md": [
+                              "Inter"
+                      ]
+              },
+              "fontSize": {
+                      "body-sm": [
+                              "14px",
+                              {
+                                      "lineHeight": "20px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "label-caps": [
+                              "12px",
+                              {
+                                      "lineHeight": "16px",
+                                      "letterSpacing": "0.05em",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "stats-num": [
+                              "32px",
+                              {
+                                      "lineHeight": "40px",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "headline-sm": [
+                              "20px",
+                              {
+                                      "lineHeight": "28px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "display-lg": [
+                              "48px",
+                              {
+                                      "lineHeight": "56px",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "body-lg": [
+                              "16px",
+                              {
+                                      "lineHeight": "24px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "headline-md": [
+                              "24px",
+                              {
+                                      "lineHeight": "32px",
+                                      "letterSpacing": "-0.01em",
+                                      "fontWeight": "600"
+                              }
+                      ]
+              }
+            },
+          },
+        }
+    </script>
+<style>
+        .bento-card {
+            background-color: theme('colors.surface-container');
+            border: 1px solid theme('colors.outline-variant');
+            border-radius: theme('borderRadius.xl');
+            padding: theme('spacing.card-padding');
+            transition: border-color 0.2s ease;
+        }
+        .bento-card:hover {
+            border-color: theme('colors.primary');
+        }
+        
+        /* Custom Checkbox styles for habits */
+        .habit-checkbox {
+            appearance: none;
+            width: 24px;
+            height: 24px;
+            border: 2px solid theme('colors.outline');
+            border-radius: 6px;
+            background-color: transparent;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+        }
+        
+        .habit-checkbox:checked {
+            background-color: theme('colors.primary');
+            border-color: theme('colors.primary');
+            transform: scale(1.1);
+        }
+        
+        .habit-checkbox:checked::after {
+            content: '';
+            position: absolute;
+            left: 7px;
+            top: 3px;
+            width: 6px;
+            height: 12px;
+            border: solid theme('colors.on-primary');
+            border-width: 0 2px 2px 0;
+            transform: rotate(45deg);
+        }
+
+        /* Progress Bar glow */
+        .progress-glow {
+            box-shadow: 0 0 10px theme('colors.tertiary-container');
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-sm min-h-screen flex">
+<!-- SideNavBar -->
+<nav class="hidden md:flex flex-col bg-surface-container dark:bg-surface-container text-primary dark:text-primary fixed left-0 top-0 h-screen w-64 border-r border-outline-variant dark:border-outline-variant py-container-padding px-4 z-20">
+<div class="mb-8 px-3">
+<h1 class="font-headline-md text-headline-md font-bold text-primary dark:text-primary">Personal OS</h1>
+<p class="font-label-caps text-label-caps text-on-surface-variant mt-1">V 2.0.4</p>
+</div>
+<div class="flex-1 space-y-2">
+<!-- Active Navigation Item -->
+<a class="flex items-center gap-element-gap text-primary dark:text-primary bg-secondary-container/20 rounded-lg px-3 py-2 scale-[0.98] transition-transform duration-150" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">dashboard</span>
+<span class="font-label-caps text-label-caps">Dashboard</span>
+</a>
+<!-- Inactive Navigation Items -->
+<a class="flex items-center gap-element-gap text-on-surface-variant dark:text-on-surface-variant px-3 py-2 hover:bg-surface-container-high dark:hover:bg-surface-container-high transition-colors rounded-lg" href="#">
+<span class="material-symbols-outlined">check_circle</span>
+<span class="font-label-caps text-label-caps">Tasks</span>
+</a>
+<a class="flex items-center gap-element-gap text-on-surface-variant dark:text-on-surface-variant px-3 py-2 hover:bg-surface-container-high dark:hover:bg-surface-container-high transition-colors rounded-lg" href="#">
+<span class="material-symbols-outlined">description</span>
+<span class="font-label-caps text-label-caps">Notes</span>
+</a>
+<a class="flex items-center gap-element-gap text-on-surface-variant dark:text-on-surface-variant px-3 py-2 hover:bg-surface-container-high dark:hover:bg-surface-container-high transition-colors rounded-lg" href="#">
+<span class="material-symbols-outlined">published_with_changes</span>
+<span class="font-label-caps text-label-caps">Habits</span>
+</a>
+<a class="flex items-center gap-element-gap text-on-surface-variant dark:text-on-surface-variant px-3 py-2 hover:bg-surface-container-high dark:hover:bg-surface-container-high transition-colors rounded-lg" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-label-caps text-label-caps">Systems</span>
+</a>
+<div class="mt-8 pt-4 border-t border-outline-variant">
+<div class="px-3 mb-4">
+<span class="font-label-caps text-label-caps text-secondary flex items-center gap-2">
+<span class="material-symbols-outlined text-[16px]">auto_awesome</span>
+      AI HUB
+    </span>
+</div>
+<div class="bg-surface-container-low rounded-lg p-3 border border-outline-variant">
+<p class="font-body-sm text-body-sm text-on-surface-variant mb-3">Daily Summary</p>
+<button class="w-full bg-secondary/10 text-secondary border border-secondary/20 font-label-caps text-label-caps py-2 rounded hover:bg-secondary/20 transition-all flex items-center justify-center gap-2" id="gen-summary-btn">
+<span class="material-symbols-outlined text-[16px]">bolt</span>
+      Generate Summary
+    </button>
+<div class="hidden mt-4 space-y-3" id="ai-summary-result">
+<div class="p-3 bg-surface-container-highest rounded border border-outline-variant text-on-surface font-body-sm">
+<p class="font-bold mb-1">Productivity Report</p>
+<p class="text-on-surface-variant text-[12px] leading-relaxed">Focus is high. Morning block was 85% efficient. Recommendation: Take a 15m break before the next deep work session.</p>
+</div>
+<button class="w-full text-primary-fixed hover:text-primary font-label-caps text-label-caps text-[12px] flex items-center justify-center gap-1">
+<span class="material-symbols-outlined text-[14px]">save</span>
+        Save to Notes
+      </button>
+</div>
+</div>
+</div>
+<script>
+  document.getElementById('gen-summary-btn')?.addEventListener('click', function() {
+    this.classList.add('opacity-50', 'pointer-events-none');
+    this.innerHTML = '<span class="material-symbols-outlined animate-spin text-[16px]">sync</span> Generating...';
+    setTimeout(() => {
+      this.classList.add('hidden');
+      document.getElementById('ai-summary-result').classList.remove('hidden');
+    }, 1500);
+  });
+</script></div>
+<button class="w-full mb-6 py-2 px-4 rounded border border-outline-variant text-on-surface-variant hover:text-primary hover:border-primary transition-colors flex items-center justify-between font-label-caps text-label-caps">
+<span>CMD+K Search</span>
+<span class="material-symbols-outlined text-[16px]">search</span>
+</button>
+<div class="space-y-2 mt-auto pt-4 border-t border-outline-variant">
+<a class="flex items-center gap-element-gap text-on-surface-variant dark:text-on-surface-variant px-3 py-2 hover:bg-surface-container-high dark:hover:bg-surface-container-high transition-colors rounded-lg" href="#">
+<span class="material-symbols-outlined">help_outline</span>
+<span class="font-label-caps text-label-caps">Support</span>
+</a>
+<a class="flex items-center gap-element-gap text-on-surface-variant dark:text-on-surface-variant px-3 py-2 hover:bg-surface-container-high dark:hover:bg-surface-container-high transition-colors rounded-lg" href="#">
+<span class="material-symbols-outlined">tune</span>
+<span class="font-label-caps text-label-caps">Settings</span>
+</a>
+</div>
+</nav>
+<!-- Main Content Area -->
+<div class="flex-1 ml-0 md:ml-64 flex flex-col min-h-screen">
+<!-- TopAppBar -->
+<header class="bg-surface dark:bg-surface text-primary dark:text-primary sticky top-0 w-full bg-surface/80 backdrop-blur-md flex justify-between items-center h-16 px-container-padding z-10">
+<div class="flex items-center gap-6">
+<!-- Mobile Menu Button (hidden on md) -->
+<button class="md:hidden text-on-surface">
+<span class="material-symbols-outlined">menu</span>
+</button>
+<div class="hidden md:flex items-center gap-6">
+<a class="font-body-lg text-body-lg text-primary font-bold border-b-2 border-primary pb-1 opacity-80 transition-opacity" href="#">Focus Mode</a>
+<a class="font-body-lg text-body-lg text-on-surface-variant dark:text-on-surface-variant hover:text-primary transition-colors" href="#">Weekly View</a>
+<a class="font-body-lg text-body-lg text-on-surface-variant dark:text-on-surface-variant hover:text-primary transition-colors" href="#">Analytics</a>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined">calendar_today</span>
+</button>
+<button class="bg-primary text-on-primary font-label-caps text-label-caps px-4 py-2 rounded hover:bg-primary-fixed transition-colors">
+                    Quick Add
+                </button>
+</div>
+</header>
+<!-- Bento Grid Content -->
+<main class="flex-1 p-4 md:p-container-padding overflow-y-auto">
+<div class="mb-8">
+<h2 class="font-display-lg text-display-lg text-on-surface mb-2">Good Morning.</h2>
+<p class="font-body-lg text-body-lg text-on-surface-variant">Here is your high-level overview for today.</p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-12 gap-grid-gap">
+<!-- Main Focus (Spans 8 cols) -->
+<div class="bento-card col-span-1 md:col-span-8 flex flex-col justify-between min-h-[300px]">
+<div class="flex justify-between items-start mb-6">
+<span class="font-label-caps text-label-caps text-primary flex items-center gap-2">
+<span class="material-symbols-outlined text-[16px]">target</span>
+                            MAIN FOCUS
+                        </span>
+<span class="font-label-caps text-label-caps text-on-surface-variant">2/3 COMPLETED</span>
+</div>
+<div class="space-y-4">
+<!-- Task 1: Completed -->
+<div class="flex items-center gap-4 opacity-50">
+<input checked="" class="habit-checkbox" disabled="" type="checkbox"/>
+<span class="font-headline-sm text-headline-sm line-through text-on-surface-variant">Finalize Q3 Strategy Deck</span>
+</div>
+<!-- Task 2: Active -->
+<div class="flex items-center gap-4">
+<input class="habit-checkbox" type="checkbox"/>
+<span class="font-headline-sm text-headline-sm text-on-surface">Review Design System PRs</span>
+</div>
+<!-- Task 3: Pending -->
+<div class="flex items-center gap-4">
+<input class="habit-checkbox" type="checkbox"/>
+<span class="font-headline-sm text-headline-sm text-on-surface">Write Weekly Update Post</span>
+</div>
+</div>
+<div class="mt-8 pt-4 border-t border-outline-variant flex justify-between items-center">
+<div class="w-full bg-surface-container-highest rounded-full h-2 mr-4">
+<div class="bg-primary h-2 rounded-full w-2/3 progress-glow"></div>
+</div>
+<span class="font-label-caps text-label-caps text-primary">66%</span>
+</div>
+</div>
+<!-- Pomodoro Timer (Spans 4 cols) -->
+<div class="bento-card col-span-1 md:col-span-4 flex flex-col justify-between items-center min-h-[300px] text-center">
+<span class="font-label-caps text-label-caps text-secondary self-start flex items-center gap-2 mb-4">
+<span class="material-symbols-outlined text-[16px]">timer</span>
+                        POMODORO
+                    </span>
+<div class="relative w-40 h-40 flex items-center justify-center">
+<!-- Simulated SVG Circle Progress -->
+<svg class="absolute inset-0 w-full h-full transform -rotate-90">
+<circle cx="80" cy="80" fill="none" r="76" stroke="var(--tw-colors-surface-container-highest)" stroke-width="4"></circle>
+<circle class="transition-all duration-1000" cx="80" cy="80" fill="none" r="76" stroke="var(--tw-colors-secondary)" stroke-dasharray="477" stroke-dashoffset="100" stroke-width="4"></circle>
+</svg>
+<div class="z-10">
+<span class="font-stats-num text-stats-num text-on-surface block">25:00</span>
+<span class="font-label-caps text-label-caps text-on-surface-variant mt-1 block">Session 2/4</span>
+</div>
+</div>
+<div class="w-full mt-6 space-y-3">
+<div class="text-left font-body-sm text-body-sm text-on-surface-variant truncate">
+                            Current: Review Design System PRs
+                        </div>
+<div class="flex gap-2">
+<button class="flex-1 bg-secondary text-on-secondary font-label-caps text-label-caps py-2 rounded hover:bg-secondary-fixed transition-colors">Start</button>
+<button class="px-3 border border-outline-variant text-on-surface rounded hover:border-on-surface transition-colors">
+<span class="material-symbols-outlined text-[18px]">stop</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Habit Tracker (Spans 6 cols) -->
+<div class="bento-card col-span-1 md:col-span-6">
+<div class="flex justify-between items-start mb-6">
+<span class="font-label-caps text-label-caps text-tertiary flex items-center gap-2">
+<span class="material-symbols-outlined text-[16px]">sync</span>
+                            DAILY HABITS
+                        </span>
+<button class="text-on-surface-variant hover:text-tertiary transition-colors">
+<span class="material-symbols-outlined text-[18px]">add</span>
+</button>
+</div>
+<div class="space-y-4">
+<!-- Habit 1 -->
+<div class="flex items-center justify-between p-3 rounded-lg bg-surface-container-high hover:bg-surface-container-highest transition-colors">
+<div class="flex items-center gap-3">
+<input checked="" class="habit-checkbox" type="checkbox"/>
+<span class="font-body-sm text-body-sm text-on-surface">Meditation (10m)</span>
+</div>
+<div class="flex items-center gap-1 text-tertiary">
+<span class="material-symbols-outlined text-[14px] fill-current">local_fire_department</span>
+<span class="font-label-caps text-label-caps">12 Days</span>
+</div>
+</div>
+<!-- Habit 2 -->
+<div class="flex items-center justify-between p-3 rounded-lg bg-surface-container-high hover:bg-surface-container-highest transition-colors">
+<div class="flex items-center gap-3">
+<input class="habit-checkbox" type="checkbox"/>
+<span class="font-body-sm text-body-sm text-on-surface">Drink 2L Water</span>
+</div>
+<div class="flex items-center gap-1 text-on-surface-variant">
+<span class="material-symbols-outlined text-[14px]">local_fire_department</span>
+<span class="font-label-caps text-label-caps">0 Days</span>
+</div>
+</div>
+<!-- Habit 3 -->
+<div class="flex items-center justify-between p-3 rounded-lg bg-surface-container-high hover:bg-surface-container-highest transition-colors">
+<div class="flex items-center gap-3">
+<input checked="" class="habit-checkbox" type="checkbox"/>
+<span class="font-body-sm text-body-sm text-on-surface">Read 20 Pages</span>
+</div>
+<div class="flex items-center gap-1 text-tertiary">
+<span class="material-symbols-outlined text-[14px] fill-current">local_fire_department</span>
+<span class="font-label-caps text-label-caps">4 Days</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Reading Widget (Spans 6 cols) -->
+<div class="bento-card col-span-1 md:col-span-6 flex flex-col justify-between">
+<span class="font-label-caps text-label-caps text-primary-fixed flex items-center gap-2 mb-4">
+<span class="material-symbols-outlined text-[16px]">menu_book</span>
+                        CURRENTLY READING
+                    </span>
+<div class="flex gap-6 items-center flex-1">
+<!-- Book Cover Placeholder -->
+<div class="w-24 h-36 rounded shadow-lg overflow-hidden shrink-0 border border-outline-variant">
+<img class="w-full h-full object-cover" data-alt="A minimalist book cover design in a dark setting. The cover features abstract geometric shapes in deep slate and vibrant emerald green. High contrast, modern aesthetic, professional lighting, cinematic depth of field." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCtuyJi4zSgw328bFnD91Bptj2SOjRUwKEUcfukkYW-vyWJlz53-pEZ53yY6ki_OknhjawSn6IUNNM4467WTG-BJgb75Q9QjILjnqKrnOsfDYRrXTaDHLWkm6DINs5Ngp-M8AAd-981RQ21hZECjqSa9ZxFfloSak6TGoellUM2OF_gjx58wjyB73Mdsk5yTMfl1QGUy9NADtuCtvyydyx9DtzUTP6-2DDzu9-BmDc9CZZYpoVSIxSvKQ"/>
+</div>
+<div class="flex-1">
+<h3 class="font-headline-sm text-headline-sm text-on-surface mb-1 line-clamp-1">The Design of Everyday Things</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant mb-4">Don Norman</p>
+<div class="mb-2 flex justify-between items-end">
+<span class="font-stats-num text-stats-num text-primary-fixed">45%</span>
+<span class="font-label-caps text-label-caps text-on-surface-variant">Pg 142 / 315</span>
+</div>
+<div class="w-full bg-surface-container-highest rounded-full h-1.5">
+<div class="bg-primary-fixed h-1.5 rounded-full w-[45%] progress-glow"></div>
+</div>
+</div>
+</div>
+<div class="mt-4 pt-4 border-t border-outline-variant flex justify-between items-center">
+<div class="font-body-sm text-body-sm text-on-surface-variant flex items-center gap-2">
+<span class="material-symbols-outlined text-[16px]">schedule</span>
+                             Last read: Today, 8:00 AM
+                        </div>
+<button class="text-primary-fixed hover:text-primary transition-colors font-label-caps text-label-caps flex items-center gap-1">
+                            LOG SESSION
+                            <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+</button>
+</div>
+</div>
+</div>
+</main>
+</div>
+<script>
+        // Simple script to handle checkbox animations and Pomodoro interaction
+        document.querySelectorAll('.habit-checkbox').forEach(checkbox => {
+            checkbox.addEventListener('change', (e) => {
+                const parent = e.target.closest('div.flex.items-center.justify-between');
+                if(parent) {
+                    const streakIcon = parent.querySelector('.material-symbols-outlined');
+                    const streakText = parent.querySelector('.font-label-caps');
+                    
+                    if (e.target.checked) {
+                        streakIcon.style.fontVariationSettings = "'FILL' 1";
+                        streakIcon.parentElement.classList.remove('text-on-surface-variant');
+                        streakIcon.parentElement.classList.add('text-tertiary');
+                    } else {
+                        streakIcon.style.fontVariationSettings = "'FILL' 0";
+                        streakIcon.parentElement.classList.remove('text-tertiary');
+                        streakIcon.parentElement.classList.add('text-on-surface-variant');
+                    }
+                }
+            });
+        });
+    </script>
+<div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/60 backdrop-blur-md" id="morning-briefing-modal">
+<div class="bg-surface-container-high border border-outline-variant rounded-xl p-8 max-w-lg w-full shadow-lg">
+<div class="mb-6">
+<h2 class="font-headline-md text-headline-md text-on-surface mb-2">Good Morning, Chief. Ready for a productive day?</h2>
+<p class="font-body-lg text-body-lg text-primary">You have 3 high-priority tasks and a clear afternoon for deep work.</p>
+</div>
+<div class="mb-8">
+<h3 class="font-label-caps text-label-caps text-on-surface-variant mb-4">TOP 3 FOCUS TASKS</h3>
+<ul class="space-y-3">
+<li class="flex items-center gap-3 text-on-surface">
+<span class="material-symbols-outlined text-primary">check_circle</span>
+<span class="font-body-sm">Finalize Q3 Strategy Deck</span>
+</li>
+<li class="flex items-center gap-3 text-on-surface">
+<span class="material-symbols-outlined text-primary">radio_button_unchecked</span>
+<span class="font-body-sm">Review Design System PRs</span>
+</li>
+<li class="flex items-center gap-3 text-on-surface">
+<span class="material-symbols-outlined text-primary">radio_button_unchecked</span>
+<span class="font-body-sm">Write Weekly Update Post</span>
+</li>
+</ul>
+</div>
+<div class="flex gap-4">
+<button class="flex-1 bg-primary text-on-primary font-label-caps text-label-caps py-3 rounded-lg hover:bg-primary-fixed transition-colors" onclick="document.getElementById('morning-briefing-modal').remove()">Accept Plan</button>
+<button class="flex-1 border border-outline-variant text-on-surface font-label-caps text-label-caps py-3 rounded-lg hover:bg-surface-container-highest transition-colors" onclick="document.getElementById('morning-briefing-modal').remove()">Adjust</button>
+</div>
+</div>
+</div></body></html>

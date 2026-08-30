@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Book Detail View - Deep Space OS</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;family=JetBrains+Mono:wght@500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-secondary-fixed": "#23005c",
+                        "on-primary-fixed": "#002113",
+                        "on-primary": "#003824",
+                        "secondary-container": "#571bc1",
+                        "secondary-fixed-dim": "#d0bcff",
+                        "inverse-primary": "#006c49",
+                        "inverse-surface": "#dae2fd",
+                        "surface-container-low": "#131b2e",
+                        "error-container": "#93000a",
+                        "inverse-on-surface": "#283044",
+                        "surface-container-lowest": "#060e20",
+                        "surface": "#0b1326",
+                        "on-tertiary-fixed": "#001e2f",
+                        "on-primary-fixed-variant": "#005236",
+                        "on-surface-variant": "#bbcabf",
+                        "primary-fixed-dim": "#4edea3",
+                        "on-secondary-container": "#c4abff",
+                        "on-tertiary": "#00344d",
+                        "surface-variant": "#2d3449",
+                        "background": "#0b1326",
+                        "tertiary-fixed-dim": "#89ceff",
+                        "outline": "#86948a",
+                        "on-primary-container": "#00422b",
+                        "primary-container": "#10b981",
+                        "on-tertiary-fixed-variant": "#004c6e",
+                        "surface-container": "#171f33",
+                        "primary-fixed": "#6ffbbe",
+                        "error": "#ffb4ab",
+                        "primary": "#4edea3",
+                        "surface-container-highest": "#2d3449",
+                        "on-error": "#690005",
+                        "on-background": "#dae2fd",
+                        "on-secondary-fixed-variant": "#5516be",
+                        "on-tertiary-container": "#003d59",
+                        "secondary-fixed": "#e9ddff",
+                        "on-secondary": "#3c0091",
+                        "tertiary": "#89ceff",
+                        "surface-dim": "#0b1326",
+                        "tertiary-fixed": "#c9e6ff",
+                        "surface-bright": "#31394d",
+                        "surface-container-high": "#222a3d",
+                        "on-surface": "#dae2fd",
+                        "tertiary-container": "#23acf1",
+                        "outline-variant": "#3c4a42",
+                        "secondary": "#d0bcff",
+                        "surface-tint": "#4edea3",
+                        "on-error-container": "#ffdad6"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "card-padding": "1.5rem",
+                        "element-gap": "0.75rem",
+                        "grid-gap": "1rem",
+                        "stack-compact": "0.5rem",
+                        "container-padding": "2rem"
+                    },
+                    "fontFamily": {
+                        "headline-md": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "headline-sm": ["Inter"],
+                        "label-caps": ["JetBrains Mono"],
+                        "body-sm": ["Inter"],
+                        "stats-num": ["Inter"],
+                        "display-lg": ["Inter"]
+                    },
+                    "fontSize": {
+                        "headline-md": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                        "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "headline-sm": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "label-caps": ["12px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "500" }],
+                        "body-sm": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "stats-num": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "display-lg": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body {
+            background-color: theme('colors.background');
+            color: theme('colors.on-background');
+        }
+        
+        .bento-card {
+            background-color: theme('colors.surface-container');
+            border: 1px solid theme('colors.surface-variant');
+            border-radius: theme('borderRadius.xl');
+            padding: theme('spacing.card-padding');
+            transition: border-color 0.2s ease;
+        }
+        
+        .bento-card:hover {
+            border-color: theme('colors.primary-container');
+        }
+        
+        /* Custom Range Slider */
+        input[type=range] {
+            -webkit-appearance: none;
+            width: 100%;
+            background: transparent;
+        }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 16px;
+            width: 16px;
+            border-radius: 50%;
+            background: theme('colors.primary-container');
+            cursor: pointer;
+            margin-top: -6px;
+            box-shadow: 0 0 10px theme('colors.primary-container');
+        }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 4px;
+            cursor: pointer;
+            background: theme('colors.surface-variant');
+            border-radius: 2px;
+        }
+        
+        /* Markdown Editor Styles */
+        .md-editor textarea {
+            background: transparent;
+            border: none;
+            color: theme('colors.on-surface');
+            font-family: theme('fontFamily.body-lg');
+            font-size: theme('fontSize.body-lg');
+            resize: none;
+            width: 100%;
+            height: 200px;
+        }
+        .md-editor textarea:focus {
+            outline: none;
+            box-shadow: none;
+        }
+        
+        /* Thin scrollbar for minimalist feel */
+        ::-webkit-scrollbar {
+            width: 4px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: theme('colors.surface-variant');
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body class="flex h-screen overflow-hidden bg-background font-body-lg text-body-lg text-on-background selection:bg-primary-container selection:text-on-primary-container antialiased">
+<!-- SideNavBar Component -->
+<nav class="hidden md:flex flex-col h-full py-container-padding px-4 bg-surface/80 backdrop-blur-md border-r border-outline-variant fixed left-0 top-0 h-screen w-64 z-20">
+<!-- Header -->
+<div class="mb-8 px-3">
+<div class="flex items-center gap-element-gap">
+<div class="w-8 h-8 rounded-full bg-surface-container-highest flex items-center justify-center shrink-0">
+<img alt="User Profile Avatar" class="w-6 h-6 object-cover rounded-full" data-alt="Abstract minimal geometric logo for a personal operating system app, subtle deep blue and soft emerald green tones, clean lines, simple shape, highly polished UI aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAJygTSbMJMUuw5215kDDDzY-nPfGcEoAk_sSLqsGjIqWG8HBtx-1XrMakWuu4rKjmO5aLK9c5GgFQ-tUJN_jX8fsC8Ik-7oYqdta60L0zD1YHeTaGCo8GXmBLjqwIwIyKs0QTGU5rbMSzmkjGgmlyoGGn1aifEuY63eXxX0D-UCBl9llJivTm6HaYISZzCNx37WElY8-iCwOcob2GmMbrtA9HiniPkbUBXtfviwwzqkVc6scb22UmqlQ"/>
+</div>
+<div>
+<h1 class="font-headline-md text-headline-md font-bold text-primary">Personal OS</h1>
+<p class="font-label-caps text-label-caps text-on-surface-variant">V 2.0.4</p>
+</div>
+</div>
+</div>
+<!-- Main Navigation -->
+<div class="flex-1 flex flex-col gap-2">
+<a class="flex items-center gap-element-gap text-on-surface-variant px-3 py-2 hover:bg-surface-container-high transition-colors rounded-lg" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">dashboard</span>
+<span class="font-label-caps text-label-caps">Dashboard</span>
+</a>
+<a class="flex items-center gap-element-gap text-on-surface-variant px-3 py-2 hover:bg-surface-container-high transition-colors rounded-lg" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">check_circle</span>
+<span class="font-label-caps text-label-caps">Tasks</span>
+</a>
+<!-- Active State on Notes for Book View -->
+<a class="flex items-center gap-element-gap text-primary bg-secondary-container/20 rounded-lg px-3 py-2 scale-[0.98] transition-transform duration-150" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">description</span>
+<span class="font-label-caps text-label-caps">Notes</span>
+</a>
+<a class="flex items-center gap-element-gap text-on-surface-variant px-3 py-2 hover:bg-surface-container-high transition-colors rounded-lg" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">published_with_changes</span>
+<span class="font-label-caps text-label-caps">Habits</span>
+</a>
+<a class="flex items-center gap-element-gap text-on-surface-variant px-3 py-2 hover:bg-surface-container-high transition-colors rounded-lg" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">settings</span>
+<span class="font-label-caps text-label-caps">Systems</span>
+</a>
+</div>
+<!-- CTA & Footer -->
+<div class="mt-auto flex flex-col gap-4">
+<button class="flex items-center justify-between w-full px-3 py-2 bg-surface-container-highest hover:bg-surface-bright text-on-surface-variant rounded-lg border border-outline-variant transition-colors text-left font-body-sm text-body-sm">
+<span>CMD+K Search</span>
+<span class="material-symbols-outlined text-sm">search</span>
+</button>
+<div class="flex flex-col gap-2 pt-4 border-t border-outline-variant">
+<a class="flex items-center gap-element-gap text-on-surface-variant px-3 py-2 hover:bg-surface-container-high transition-colors rounded-lg" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">help_outline</span>
+<span class="font-label-caps text-label-caps">Support</span>
+</a>
+<a class="flex items-center gap-element-gap text-on-surface-variant px-3 py-2 hover:bg-surface-container-high transition-colors rounded-lg" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">tune</span>
+<span class="font-label-caps text-label-caps">Settings</span>
+</a>
+</div>
+</div>
+</nav>
+<!-- Main Content Wrapper -->
+<div class="flex-1 flex flex-col md:ml-64 w-full h-full relative">
+<!-- TopAppBar Component -->
+<header class="sticky top-0 w-full bg-surface/80 backdrop-blur-md flex justify-between items-center h-16 px-container-padding z-10">
+<!-- Mobile Brand/Logo (Hidden on Desktop since SideNav has it) -->
+<div class="md:hidden font-headline-md text-headline-md font-extrabold text-primary">
+                Personal OS
+            </div>
+<!-- Left/Center Navigation -->
+<div class="hidden md:flex items-center gap-6">
+<a class="text-on-surface-variant hover:text-primary transition-colors font-headline-sm text-headline-sm" href="#">Library</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors font-headline-sm text-headline-sm" href="#">Authors</a>
+<!-- Active State -->
+<a class="text-primary font-bold border-b-2 border-primary pb-1 font-headline-sm text-headline-sm opacity-80 transition-opacity" href="#">Book Details</a>
+</div>
+<!-- Trailing Actions -->
+<div class="flex items-center gap-4">
+<button class="text-on-surface-variant hover:text-primary transition-colors p-1">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="text-on-surface-variant hover:text-primary transition-colors p-1">
+<span class="material-symbols-outlined">calendar_today</span>
+</button>
+<button class="bg-primary text-on-primary hover:bg-primary-fixed-dim transition-colors px-4 py-2 rounded-full font-label-caps text-label-caps flex items-center gap-2">
+<span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">add</span>
+                    Quick Add
+                </button>
+</div>
+</header>
+<!-- Canvas / Bento Grid Area -->
+<main class="flex-1 overflow-y-auto p-4 md:p-container-padding pb-24 md:pb-container-padding">
+<div class="max-w-5xl mx-auto w-full">
+<!-- Header / Back Navigation -->
+<div class="flex items-center gap-element-gap mb-8">
+<button class="flex items-center gap-2 text-on-surface-variant hover:text-primary transition-colors group">
+<span class="material-symbols-outlined group-hover:-translate-x-1 transition-transform" data-icon="arrow_back">arrow_back</span>
+<span class="font-label-caps text-label-caps">BACK TO DASHBOARD</span>
+</button>
+</div>
+<!-- Bento Grid Layout -->
+<div class="grid grid-cols-1 md:grid-cols-12 gap-grid-gap">
+<!-- Hero Section: Book Details (Span 12 or 8) -->
+<div class="bento-card md:col-span-8 flex flex-col sm:flex-row gap-grid-gap items-start relative overflow-hidden group">
+<!-- Subtle background gradient -->
+<div class="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent pointer-events-none"></div>
+<img alt="Book Cover" class="w-32 sm:w-48 aspect-[2/3] object-cover rounded-lg shadow-2xl relative z-10" data-alt="A high-resolution, striking book cover design sitting on a minimalist desk. The cover features abstract, geometric patterns in deep blues and cyan, conveying a sense of advanced technology or systemic thinking. The lighting is dramatic, highlighting the texture of the cover against a dark slate background. Modern, sleek, intellectual aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA5tZHeaXkKG0KXnOrOyCZqXz2kTURqcBxp9ttpuhzEbTzgc8Ihr6nMb8uHJ1My7lE4m8nE6EQ6jE3DsgglsBaRP-1wWvMbjbG8CJ8EwbyKX0N8EC7KHCQr1iI984rUe9aSa5OQbGgYNXsE9bz5nrjjy4P5LEBwmNrUraEIVxLxD6w-ryGtQRYw4Aue_jNyHf4WRbLZGaUJy6f6oMPR_uQxjRw1MV6XRX9NcK1uSTH-K1Qw8ZUSP7nmVQ"/>
+<div class="flex flex-col flex-1 relative z-10">
+<div class="flex justify-between items-start w-full">
+<div>
+<h1 class="font-display-lg text-display-lg text-on-surface mb-2">Thinking in Systems</h1>
+<p class="font-headline-sm text-headline-sm text-primary-container mb-4">Donella H. Meadows</p>
+</div>
+<button class="text-on-surface-variant hover:text-primary transition-colors p-2">
+<span class="material-symbols-outlined" data-icon="more_vert">more_vert</span>
+</button>
+</div>
+<div class="flex flex-wrap gap-2 mb-6">
+<span class="px-3 py-1 bg-surface-container-high rounded-full font-label-caps text-label-caps text-on-surface-variant border border-surface-variant">SYSTEMS</span>
+<span class="px-3 py-1 bg-surface-container-high rounded-full font-label-caps text-label-caps text-on-surface-variant border border-surface-variant">NON-FICTION</span>
+<span class="px-3 py-1 bg-primary/10 rounded-full font-label-caps text-label-caps text-primary border border-primary/30 flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]" data-icon="star">star</span>
+                                4.8
+                            </span>
+</div>
+<p class="font-body-lg text-body-lg text-on-surface-variant line-clamp-3 mb-6">
+                            Thinking in Systems, is a concise and crucial book offering insight for problem solving on scales ranging from the personal to the global. Edited by the Sustainability Institute's Diana Wright, this essential primer brings systems thinking out of the realm of computers and equations and into the tangible world...
+                        </p>
+<div class="mt-auto flex items-center gap-4">
+<button class="px-6 py-2 bg-primary-container text-on-primary-container font-label-caps text-label-caps rounded-lg hover:bg-primary-container/90 transition-colors flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px]" data-icon="link">link</span>
+                                SEND TO KNOWLEDGE HUB
+                            </button>
+</div>
+</div>
+</div>
+<!-- Reading Session (Span 4) -->
+<div class="bento-card md:col-span-4 flex flex-col relative overflow-hidden group">
+<div class="flex items-center gap-2 text-on-surface-variant mb-6">
+<span class="material-symbols-outlined" data-icon="timer">timer</span>
+<span class="font-label-caps text-label-caps">READING SESSION</span>
+</div>
+<div class="flex-1 flex flex-col items-center justify-center py-6">
+<div class="font-display-lg text-[64px] leading-none text-primary-container font-bold tracking-tighter mb-2" id="session-timer">
+                            00:00
+                        </div>
+<div class="font-body-sm text-body-sm text-on-surface-variant">Session Duration</div>
+</div>
+<button class="w-full py-3 border border-primary-container text-primary-container font-label-caps text-label-caps rounded-lg hover:bg-primary-container/10 transition-colors flex items-center justify-center gap-2 group">
+<span class="material-symbols-outlined" data-icon="play_arrow">play_arrow</span>
+                        START READING
+                    </button>
+</div>
+<!-- Progress Tracking (Span 12) -->
+<div class="bento-card md:col-span-12 flex flex-col gap-4">
+<div class="flex justify-between items-center mb-2">
+<div class="flex items-center gap-2 text-on-surface-variant">
+<span class="material-symbols-outlined" data-icon="menu_book">menu_book</span>
+<span class="font-label-caps text-label-caps">PROGRESS</span>
+</div>
+<div class="font-stats-num text-headline-md text-primary-container">
+<span id="percent-display">34</span>%
+                        </div>
+</div>
+<div class="flex items-center gap-4 w-full">
+<span class="font-body-sm text-body-sm text-on-surface-variant w-12">Pg 1</span>
+<div class="flex-1 relative group">
+<!-- Progress Bar Track Background (handled by custom CSS) -->
+<input class="w-full relative z-10" id="page-slider" max="350" min="1" type="range" value="120"/>
+<!-- Active Progress Fill -->
+<div class="absolute top-[6px] left-0 h-[4px] bg-primary-container rounded-full pointer-events-none z-0" id="progress-fill" style="width: 34%;"></div>
+</div>
+<span class="font-body-sm text-body-sm text-on-surface-variant w-16 text-right">Pg 350</span>
+</div>
+<div class="text-center font-headline-sm text-headline-sm text-on-surface mt-2">
+                        Page <span class="text-primary-container font-bold" id="current-page-display">120</span> of 350
+                    </div>
+</div>
+<!-- Notes & Quotes Markdown Editor (Span 8) -->
+<div class="bento-card md:col-span-8 flex flex-col">
+<div class="flex justify-between items-center mb-4 border-b border-surface-variant pb-4">
+<div class="flex items-center gap-2 text-on-surface-variant">
+<span class="material-symbols-outlined" data-icon="edit_note">edit_note</span>
+<span class="font-label-caps text-label-caps">NOTES &amp; QUOTES</span>
+</div>
+<div class="flex gap-2">
+<button class="p-1.5 text-on-surface-variant hover:text-primary transition-colors rounded"><span class="material-symbols-outlined text-[18px]" data-icon="format_bold">format_bold</span></button>
+<button class="p-1.5 text-on-surface-variant hover:text-primary transition-colors rounded"><span class="material-symbols-outlined text-[18px]" data-icon="format_italic">format_italic</span></button>
+<button class="p-1.5 text-on-surface-variant hover:text-primary transition-colors rounded"><span class="material-symbols-outlined text-[18px]" data-icon="format_list_bulleted">format_list_bulleted</span></button>
+</div>
+</div>
+<div class="md-editor flex-1">
+<textarea placeholder="Capture insights, quotes, or thoughts here... Use markdown formatting.">## Core Concepts
+
+- **Stocks**: The elements of a system that you can see, feel, count, or measure at any given time.
+- **Flows**: Filling and draining, births and deaths, purchases and sales, growth and decay, deposits and withdrawals, successes and failures.
+
+&gt; "A system is more than the sum of its parts. It may exhibit dynamic, adaptive, goal-seeking, self-preserving, and sometimes evolutionary behavior." (Page 11)
+
+Insight: Need to apply this to the current project architecture. We are focusing too much on individual components (stocks) and not enough on the data flow between them.
+                        </textarea>
+</div>
+<div class="text-right mt-4 pt-4 border-t border-surface-variant">
+<span class="font-body-sm text-body-sm text-on-surface-variant">Last saved 2m ago</span>
+</div>
+</div>
+<!-- AI Insights Panel (Span 4) -->
+<div class="bento-card md:col-span-4 flex flex-col gap-6 relative overflow-hidden group border-secondary/30 shadow-[0_0_15px_rgba(208,188,255,0.05)]">
+<!-- Subtle glow -->
+<div class="absolute -top-10 -right-10 w-32 h-32 bg-secondary/10 rounded-full blur-3xl pointer-events-none"></div>
+<div class="flex items-center gap-2 text-secondary mb-2">
+<span class="material-symbols-outlined" data-icon="magic_button">magic_button</span>
+<span class="font-label-caps text-label-caps">AI INSIGHTS</span>
+</div>
+<button class="w-full py-3 bg-secondary/10 border border-secondary/30 text-secondary font-label-caps text-label-caps rounded-lg hover:bg-secondary/20 transition-colors flex items-center justify-center gap-2 group shadow-[0_0_15px_rgba(208,188,255,0.1)]">
+<span class="material-symbols-outlined" data-icon="auto_awesome">auto_awesome</span>
+                        SUMMARIZE NOTES WITH AI
+                    </button>
+<div class="flex-1 bg-surface-bright rounded-lg p-4 border border-secondary/20 relative shadow-[0_0_10px_rgba(208,188,255,0.1)]">
+<div class="absolute top-0 right-0 p-2">
+<span class="material-symbols-outlined text-secondary/50 text-[16px]" data-icon="psychology">psychology</span>
+</div>
+<h4 class="font-headline-sm text-headline-sm text-on-surface mb-3 text-[16px]">Generated Summary</h4>
+<ul class="space-y-3 font-body-sm text-body-sm text-on-surface-variant">
+<li class="flex gap-2">
+<span class="text-secondary mt-1">•</span>
+<span><strong>Systems &gt; Parts:</strong> Focus on relationships and flows, not just individual entities (Stocks vs Flows).</span>
+</li>
+<li class="flex gap-2">
+<span class="text-secondary mt-1">•</span>
+<span><strong>Adaptive Behavior:</strong> Systems naturally seek goals and self-preserve.</span>
+</li>
+<li class="flex gap-2">
+<span class="text-secondary mt-1">•</span>
+<span><strong>Action Item:</strong> Apply systems thinking to current project architecture, focusing on data flows.</span>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+<script>
+        // Simple slider logic for progress
+        const slider = document.getElementById('page-slider');
+        const fill = document.getElementById('progress-fill');
+        const currentDisplay = document.getElementById('current-page-display');
+        const percentDisplay = document.getElementById('percent-display');
+
+        slider.addEventListener('input', (e) => {
+            const val = e.target.value;
+            const max = e.target.max;
+            const percentage = (val / max) * 100;
+            
+            fill.style.width = `${percentage}%`;
+            currentDisplay.textContent = val;
+            percentDisplay.textContent = Math.round(percentage);
+        });
+    </script>
+</body></html>
