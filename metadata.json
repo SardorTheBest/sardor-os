@@ -1,0 +1,8 @@
+{
+  "name": "Sardor OS",
+  "description": "A high-performance minimalist Deep Space personal operating system featuring unified tasks, interactive calendar, habit heatmaps, reading tracker, notes knowledge hub, and project objectives.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
