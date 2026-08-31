@@ -2,7 +2,7 @@ import { Language } from '../types';
 
 export const translations = {
   ru: {
-    appName: 'Sardor OS',
+    appName: 'Zing',
     appSubtitle: 'САРДОР • БУХАРА',
     orbit: 'ОРБИТА УПРАВЛЕНИЯ',
     
@@ -27,7 +27,7 @@ export const translations = {
 
     // Topbar
     topbar: {
-      searchPlaceholder: 'Поиск по Sardor OS...',
+      searchPlaceholder: 'Поиск по Zing...',
       synced: 'Синхронизировано',
       syncing: 'Синхронизация...',
       offline: 'Офлайн (IndexedDB)',
@@ -73,7 +73,7 @@ export const translations = {
       clearChat: 'Очистить диалог',
       generating: 'Nova обрабатывает запрос...',
       connectionError: 'Ошибка подключения к модели.',
-      initialGreeting: `⚡ **Приветствую, Сардор!** Я **Nova** — твой персональный ИИ-ассистент в системе **Sardor OS**.
+      initialGreeting: `⚡ **Приветствую, Сардор!** Я **Nova** — твой персональный ИИ-ассистент в системе **Zing**.
 
 Чем могу помочь сегодня? Вы можете писать код, разбирать алгоритмы, анализировать продуктивность или создавать медиа через Google AI Studio & Veo.`,
       
@@ -146,7 +146,7 @@ export const translations = {
   },
 
   en: {
-    appName: 'Sardor OS',
+    appName: 'Zing',
     appSubtitle: 'SARDOR • BUKHARA',
     orbit: 'COMMAND ORBIT',
 
@@ -171,7 +171,7 @@ export const translations = {
 
     // Topbar
     topbar: {
-      searchPlaceholder: 'Search anything in Sardor OS...',
+      searchPlaceholder: 'Search anything in Zing...',
       synced: 'Synced',
       syncing: 'Syncing...',
       offline: 'Offline (IndexedDB)',
@@ -217,7 +217,7 @@ export const translations = {
       clearChat: 'Clear chat',
       generating: 'Nova is processing...',
       connectionError: 'Connection error to AI model.',
-      initialGreeting: `⚡ **Greetings, Sardor!** I am **Nova** — your personal AI assistant in **Sardor OS**.
+      initialGreeting: `⚡ **Greetings, Sardor!** I am **Nova** — your personal AI assistant in **Zing**.
 
 How can I assist you today? You can write code, analyze algorithms, audit productivity, or generate media with Google AI Studio & Veo.`,
 

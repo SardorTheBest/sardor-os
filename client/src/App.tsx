@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { storage } from './lib/storage';
 import { AppState } from './types';
 import { Navigation } from './components/Navigation';
+import { BottomNavigationBar } from './components/BottomNavigationBar';
 import { DashboardModule } from './components/DashboardModule';
 import { TasksModule } from './components/TasksModule';
 import { CalendarModule } from './components/CalendarModule';
@@ -14,8 +15,10 @@ import { AIAssistantDrawer } from './components/AIAssistantDrawer';
 import { CommandPalette } from './components/CommandPalette';
 import { SyncModal } from './components/SyncModal';
 import { ShortcutsModal } from './components/ShortcutsModal';
+import { NotificationCenterModal } from './components/NotificationCenterModal';
 import { LockScreen } from './components/LockScreen';
 import { syncService, SyncState } from './lib/supabaseSync';
+import { notificationService } from './lib/notificationService';
 import { sound } from './lib/sound';
 import { i18n } from './lib/i18n';
 import { themeManager } from './lib/theme';
@@ -26,8 +29,8 @@ import {
   Sun,
   Moon,
   Globe,
-  PanelLeftClose,
-  PanelLeftOpen,
+  Bell,
+  BellRing,
 } from 'lucide-react';
 
 export function App() {
@@ -35,6 +38,7 @@ export function App() {
   const [isOmnibarOpen, setIsOmnibarOpen] = useState(false);
   const [isSyncModalOpen, setIsSyncModalOpen] = useState(false);
   const [isShortcutsOpen, setIsShortcutsOpen] = useState(false);
+  const [isNotificationModalOpen, setIsNotificationModalOpen] = useState(false);
   const [isLocked, setIsLocked] = useState(false);
   const [soundEnabled, setSoundEnabled] = useState(sound.isEnabled());
   const [isNavCollapsed, setIsNavCollapsed] = useState(false);
@@ -46,6 +50,14 @@ export function App() {
   const [lastSyncTime, setLastSyncTime] = useState<string | null>(null);
 
   useEffect(() => {
+    // Initialize offline notification system
+    notificationService.init();
+    const unsubNotifyNav = notificationService.onNotificationNavigate((targetView) => {
+      if (targetView) {
+        handleSelectView(targetView as any);
+      }
+    });
+
     const unsubStorage = storage.subscribe((newState) => {
       setState({ ...newState });
     });
@@ -61,6 +73,7 @@ export function App() {
     });
 
     return () => {
+      unsubNotifyNav();
       unsubStorage();
       unsubSync();
       unsubLang();
@@ -187,36 +200,46 @@ export function App() {
       {/* Main Execution View Canvas */}
       <div className="flex-1 flex flex-col min-w-0 h-screen overflow-y-auto">
         {/* Top Floating App Bar */}
-        <header className="h-16 border-b border-[#222a3d] px-4 md:px-8 flex items-center justify-between bg-[#060e20]/90 backdrop-blur-md sticky top-0 z-20 flex-shrink-0">
-          <div className="flex items-center gap-3">
-            {/* Nav expand toggle button for small screens / collapsed state */}
-            <button
-              onClick={() => setIsNavCollapsed((prev) => !prev)}
-              title={isNavCollapsed ? 'Развернуть меню' : 'Свернуть меню'}
-              className="p-2 rounded-xl bg-[#131b2e] hover:bg-[#171f33] border border-[#222a3d] text-[#86948a] hover:text-[#dae2fd] transition-colors md:hidden"
-            >
-              {isNavCollapsed ? <PanelLeftOpen className="w-4 h-4" /> : <PanelLeftClose className="w-4 h-4" />}
-            </button>
+        <header className="h-14 md:h-16 border-b border-[#222a3d] px-3.5 md:px-8 flex items-center justify-between bg-[#060e20]/95 backdrop-blur-md sticky top-0 z-20 flex-shrink-0 pt-[env(safe-area-inset-top)]">
+          <div className="flex items-center gap-2.5">
+            {/* Mobile Brand Wordmark */}
+            <div className="flex items-center gap-2 md:hidden">
+              <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-[#00ffab] via-[#4edea3] to-[#00e5ff] flex items-center justify-center shadow-md shadow-[#00ffab]/20 flex-shrink-0">
+                <span className="font-bold text-[#003824] text-sm font-mono tracking-tighter">Z</span>
+              </div>
+              <span className="font-bold text-sm font-mono text-[#dae2fd] tracking-wider">
+                ZING
+              </span>
+            </div>
 
-            {/* Omnibar search launcher */}
+            {/* Spotlight search launcher */}
             <button
               onClick={() => setIsOmnibarOpen(true)}
-              className="flex items-center gap-2.5 px-3.5 py-1.5 rounded-xl bg-[#131b2e] hover:bg-[#171f33] border border-[#222a3d] text-xs text-[#86948a] hover:text-[#dae2fd] transition-colors"
+              className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[#131b2e] hover:bg-[#171f33] border border-[#222a3d] text-xs text-[#86948a] hover:text-[#dae2fd] transition-colors"
             >
-              <Search className="w-3.5 h-3.5" />
+              <Search className="w-3.5 h-3.5 text-[#00ffab]" />
               <span className="hidden sm:inline">{tTop.searchPlaceholder}</span>
-              <kbd className="hidden sm:inline-block px-1.5 py-0.5 rounded bg-[#0b1326] text-[10px] font-mono border border-[#222a3d]">
-                ⌘K
-              </kbd>
             </button>
           </div>
 
-          <div className="flex items-center gap-2 md:gap-3">
+          <div className="flex items-center gap-1.5 md:gap-3">
+            {/* Offline Notification Bell & Reminders Center */}
+            <button
+              onClick={() => setIsNotificationModalOpen(true)}
+              title={currentLang === 'ru' ? 'Офлайн-напоминания и уведомления' : 'Offline Reminders & Notifications'}
+              className="p-2 rounded-xl bg-[#131b2e] hover:bg-[#171f33] border border-[#222a3d] text-[#86948a] hover:text-[#00ffab] transition-all hover:border-[#00ffab]/40 relative group"
+            >
+              <Bell className="w-4 h-4" />
+              {notificationService.isPermissionGranted() && (
+                <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-[#00ffab] shadow-[0_0_6px_#00ffab]" />
+              )}
+            </button>
+
             {/* Language Switcher (RU / EN) */}
             <button
               onClick={handleToggleLanguage}
               title={currentLang === 'ru' ? 'Switch to English' : 'Переключить на русский'}
-              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-[#131b2e] hover:bg-[#171f33] border border-[#222a3d] text-xs font-mono text-[#dae2fd] transition-all hover:border-[#00ffab]/40"
+              className="flex items-center gap-1 px-2 md:px-2.5 py-1.5 rounded-xl bg-[#131b2e] hover:bg-[#171f33] border border-[#222a3d] text-xs font-mono text-[#dae2fd] transition-all hover:border-[#00ffab]/40"
             >
               <Globe className="w-3.5 h-3.5 text-[#00e5ff]" />
               <span className="font-bold">{currentLang.toUpperCase()}</span>
@@ -238,7 +261,7 @@ export function App() {
             {/* Sync Status Pill */}
             <button
               onClick={() => setIsSyncModalOpen(true)}
-              className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[#131b2e] hover:bg-[#171f33] border border-[#222a3d] text-xs font-mono transition-all group"
+              className="flex items-center gap-1.5 px-2.5 md:px-3 py-1.5 rounded-xl bg-[#131b2e] hover:bg-[#171f33] border border-[#222a3d] text-xs font-mono transition-all group"
             >
               <div
                 className={`w-2 h-2 rounded-full ${
@@ -261,7 +284,7 @@ export function App() {
             </button>
 
             {state.user.focusMode && (
-              <div className="px-3 py-1 rounded-full bg-[#00ffab]/10 border border-[#00ffab]/40 text-[#00ffab] text-xs font-mono flex items-center gap-1.5 animate-pulse">
+              <div className="px-2.5 py-1 rounded-full bg-[#00ffab]/10 border border-[#00ffab]/40 text-[#00ffab] text-xs font-mono flex items-center gap-1.5 animate-pulse">
                 <Sparkles className="w-3.5 h-3.5" />
                 <span className="hidden sm:inline">Focus Orbit</span>
               </div>
@@ -273,8 +296,8 @@ export function App() {
           </div>
         </header>
 
-        {/* Dynamic View Body */}
-        <main className={`flex-1 ${state.activeView === 'ai' ? 'p-4 md:p-8' : 'p-4 md:p-8'}`}>
+        {/* Dynamic View Body (with bottom padding for mobile navigation bar) */}
+        <main className={`flex-1 pb-24 md:pb-8 ${state.activeView === 'ai' ? 'p-3 md:p-8' : 'p-3 md:p-8'}`}>
           {state.activeView === 'dashboard' && (
             <DashboardModule state={state} onNavigate={handleSelectView} />
           )}
@@ -283,12 +306,27 @@ export function App() {
           {state.activeView === 'habits' && <HabitsModule state={state} />}
           {state.activeView === 'books' && <BooksModule state={state} />}
           {state.activeView === 'notes' && <NotesModule state={state} />}
-          {state.activeView === 'projects' && <ProjectsModule state={state} />}
+          {state.activeView === 'projects' && (
+            <ProjectsModule state={state} onNavigate={handleSelectView} />
+          )}
           {state.activeView === 'ai' && (
             <AIAnalystModule state={state} onNavigate={handleSelectView} />
           )}
         </main>
       </div>
+
+      {/* Mobile Bottom Navigation Bar (< 768px) */}
+      <BottomNavigationBar
+        activeView={state.activeView}
+        onSelectView={handleSelectView}
+        tasksCount={pendingTasksCount}
+        user={state.user}
+        onToggleFocus={handleToggleFocus}
+        soundEnabled={soundEnabled}
+        onToggleSound={handleToggleSound}
+        onOpenShortcuts={() => setIsShortcutsOpen(true)}
+        onLockApp={() => setIsLocked(true)}
+      />
 
       {/* Omnibar / Command Palette */}
       <CommandPalette
@@ -304,6 +342,17 @@ export function App() {
         state={state}
         isOpen={isSyncModalOpen}
         onClose={() => setIsSyncModalOpen(false)}
+      />
+
+      {/* Offline Notification Center Modal */}
+      <NotificationCenterModal
+        state={state}
+        isOpen={isNotificationModalOpen}
+        onClose={() => setIsNotificationModalOpen(false)}
+        onNavigate={(view, id) => {
+          handleSelectView(view);
+          setIsNotificationModalOpen(false);
+        }}
       />
 
       {/* Keyboard Shortcuts Cheat Sheet */}

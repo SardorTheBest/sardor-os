@@ -1,9 +1,10 @@
-import { AppState, Book, Habit, Note, Project, ReadingSession, Tag, Task, UserProfile, AISettings, Language, Theme } from '../types';
+import { AppState, Book, BookQuote, Habit, Note, Project, ReadingSession, Tag, Task, UserProfile, AISettings, Language, Theme } from '../types';
 import { db } from './db';
 import { sound } from './sound';
 import { syncService } from './supabaseSync';
 import { i18n } from './i18n';
 import { themeManager } from './theme';
+import { notificationService } from './notificationService';
 
 const STORAGE_KEY = 'sardor_os_state_v3_clean';
 
@@ -144,6 +145,8 @@ export class StorageManager {
       await db.books.bulkPut(this.state.books);
       await db.notes.bulkPut(this.state.notes);
       await db.projects.bulkPut(this.state.projects);
+      // Sync scheduled reminders to SW & Dexie
+      notificationService.syncAllReminders(this.state.tasks, this.state.habits);
     } catch (e) {
       // Background operation failure shouldn't crash app
     }
@@ -237,13 +240,45 @@ export class StorageManager {
     return false;
   }
 
-  public rescheduleTask(id: string, newDate: string, newTime?: string): boolean {
+  public rescheduleTask(
+    id: string,
+    newDate?: string,
+    newTime?: string,
+    startTime?: string,
+    endTime?: string
+  ): boolean {
     const task = this.state.tasks.find((t) => t.id === id);
     if (!task) return false;
-    task.dueDate = newDate;
-    if (newTime !== undefined) {
-      task.dueTime = newTime;
+    if (newDate !== undefined) {
+      task.dueDate = newDate || undefined;
     }
+    if (newTime !== undefined) {
+      task.dueTime = newTime || undefined;
+    }
+    if (startTime !== undefined) {
+      task.startTime = startTime || undefined;
+    }
+    if (endTime !== undefined) {
+      task.endTime = endTime || undefined;
+    }
+    task.updatedAt = new Date().toISOString();
+    sound.playPop();
+    this.saveState();
+    return true;
+  }
+
+  public scheduleTaskTimeSpan(
+    id: string,
+    dateStr: string,
+    startTime: string,
+    endTime: string
+  ): boolean {
+    const task = this.state.tasks.find((t) => t.id === id);
+    if (!task) return false;
+    task.dueDate = dateStr;
+    task.dueTime = startTime;
+    task.startTime = startTime;
+    task.endTime = endTime;
     task.updatedAt = new Date().toISOString();
     sound.playPop();
     this.saveState();
@@ -301,6 +336,17 @@ export class StorageManager {
     return newHabit;
   }
 
+  public updateHabit(id: string, updates: Partial<Habit>): Habit | null {
+    const index = this.state.habits.findIndex((h) => h.id === id);
+    if (index === -1) return null;
+    this.state.habits[index] = {
+      ...this.state.habits[index],
+      ...updates,
+    };
+    this.saveState();
+    return this.state.habits[index];
+  }
+
   public deleteHabit(id: string): boolean {
     const initialLen = this.state.habits.length;
     this.state.habits = this.state.habits.filter((h) => h.id !== id);
@@ -313,31 +359,71 @@ export class StorageManager {
   }
 
   // --- Book CRUD ---
-  public addBook(bookData: Omit<Book, 'id' | 'quotes'>): Book {
+  public addBook(bookData: Omit<Book, 'id' | 'quotes'> & { quotes?: BookQuote[] }): Book {
+    const id = `book-${Date.now()}-${Math.random().toString(36).substr(2, 6)}`;
+    const now = new Date().toISOString();
     const newBook: Book = {
       ...bookData,
-      id: `book-${Date.now()}`,
-      quotes: [],
+      id,
+      quotes: bookData.quotes || [],
+      currentPage: Number(bookData.currentPage) || 0,
+      totalPages: Number(bookData.totalPages) || 100,
+      status: bookData.status || 'reading',
+      rating: bookData.rating ?? 5,
+      createdAt: now,
+      updatedAt: now,
     };
-    this.state.books.unshift(newBook);
+    this.state.books = [newBook, ...this.state.books];
     sound.playPop();
     this.saveState();
+
+    // Async Dexie & Supabase sync
+    db.books.put(newBook).catch((err) => console.warn('Dexie book insert error:', err));
+    syncService.queueRecord('books', 'insert', newBook);
+
     return newBook;
   }
 
   public updateBook(id: string, updates: Partial<Book>): Book | null {
     const index = this.state.books.findIndex((b) => b.id === id);
     if (index === -1) return null;
-    this.state.books[index] = {
-      ...this.state.books[index],
+    const current = this.state.books[index];
+    const updated: Book = {
+      ...current,
       ...updates,
+      currentPage: updates.currentPage !== undefined ? Number(updates.currentPage) : current.currentPage,
+      totalPages: updates.totalPages !== undefined ? Number(updates.totalPages) : current.totalPages,
+      updatedAt: new Date().toISOString(),
     };
-    if (updates.currentPage === this.state.books[index].totalPages) {
-      this.state.books[index].status = 'completed';
+
+    if (updated.currentPage >= updated.totalPages && updated.status !== 'completed') {
+      updated.status = 'completed';
+      if (!updated.finishDate) {
+        updated.finishDate = new Date().toISOString().split('T')[0];
+      }
       sound.playComplete();
     }
+
+    this.state.books[index] = updated;
     this.saveState();
-    return this.state.books[index];
+
+    db.books.put(updated).catch((err) => console.warn('Dexie book update error:', err));
+    syncService.queueRecord('books', 'update', updated);
+
+    return updated;
+  }
+
+  public deleteBook(id: string): boolean {
+    const initialLen = this.state.books.length;
+    this.state.books = this.state.books.filter((b) => b.id !== id);
+    if (this.state.books.length !== initialLen) {
+      sound.playClick();
+      this.saveState();
+      db.books.delete(id).catch((err) => console.warn('Dexie book delete error:', err));
+      syncService.queueRecord('books', 'delete', { id });
+      return true;
+    }
+    return false;
   }
 
   public logReadingSession(bookId: string, durationMinutes: number, pagesRead: number): ReadingSession {
@@ -353,29 +439,46 @@ export class StorageManager {
     // Increment book page
     const book = this.state.books.find((b) => b.id === bookId);
     if (book) {
-      book.currentPage = Math.min(book.totalPages, book.currentPage + pagesRead);
-      if (book.currentPage >= book.totalPages) {
-        book.status = 'completed';
-        book.finishDate = new Date().toISOString().split('T')[0];
-      }
+      const newPage = Math.min(book.totalPages, book.currentPage + pagesRead);
+      this.updateBook(bookId, {
+        currentPage: newPage,
+        ...(newPage >= book.totalPages ? { status: 'completed', finishDate: new Date().toISOString().split('T')[0] } : {}),
+      });
     }
 
     sound.playComplete();
     this.saveState();
+    db.readingSessions.put(session).catch(console.warn);
+    syncService.queueRecord('reading_sessions', 'insert', session);
     return session;
   }
 
   public addBookQuote(bookId: string, text: string, page?: number) {
     const book = this.state.books.find((b) => b.id === bookId);
     if (!book) return;
-    book.quotes.unshift({
-      id: `q-${Date.now()}`,
+    const newQuote: BookQuote = {
+      id: `q-${Date.now()}-${Math.random().toString(36).substr(2, 4)}`,
       text: text.trim(),
       page,
       createdAt: new Date().toISOString(),
-    });
+    };
+    book.quotes = [newQuote, ...book.quotes];
+    book.updatedAt = new Date().toISOString();
     sound.playPop();
     this.saveState();
+    db.books.put(book).catch(console.warn);
+    syncService.queueRecord('books', 'update', book);
+  }
+
+  public deleteBookQuote(bookId: string, quoteId: string) {
+    const book = this.state.books.find((b) => b.id === bookId);
+    if (!book) return;
+    book.quotes = book.quotes.filter((q) => q.id !== quoteId);
+    book.updatedAt = new Date().toISOString();
+    sound.playClick();
+    this.saveState();
+    db.books.put(book).catch(console.warn);
+    syncService.queueRecord('books', 'update', book);
   }
 
   // --- Note CRUD ---
@@ -425,14 +528,18 @@ export class StorageManager {
   }
 
   // --- Projects CRUD ---
-  public addProject(projectData: Omit<Project, 'id'>): Project {
+  public addProject(projectData: Omit<Project, 'id' | 'createdAt' | 'updatedAt'>): Project {
     const newProject: Project = {
       ...projectData,
       id: `proj-${Date.now()}`,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
     };
-    this.state.projects.push(newProject);
+    this.state.projects.unshift(newProject);
     sound.playPop();
     this.saveState();
+    db.projects.put(newProject).catch(console.warn);
+    syncService.queueRecord('projects', 'insert', newProject);
     return newProject;
   }
 
@@ -442,9 +549,58 @@ export class StorageManager {
     this.state.projects[index] = {
       ...this.state.projects[index],
       ...updates,
+      updatedAt: new Date().toISOString(),
     };
     this.saveState();
+    db.projects.put(this.state.projects[index]).catch(console.warn);
+    syncService.queueRecord('projects', 'update', this.state.projects[index]);
     return this.state.projects[index];
+  }
+
+  public deleteProject(id: string): { success: boolean; deletedTasksCount: number } {
+    const initialLen = this.state.projects.length;
+    const projectToDelete = this.state.projects.find((p) => p.id === id);
+    if (!projectToDelete) {
+      return { success: false, deletedTasksCount: 0 };
+    }
+
+    this.state.projects = this.state.projects.filter((p) => p.id !== id);
+
+    // Delete all tasks linked to this project
+    const tasksToDelete = this.state.tasks.filter((t) => t.projectId === id);
+    const deletedTasksCount = tasksToDelete.length;
+    this.state.tasks = this.state.tasks.filter((t) => t.projectId !== id);
+
+    sound.playClick();
+    this.saveState();
+
+    // Delete from Dexie
+    db.projects.delete(id).catch((err) => console.warn('Dexie project delete error:', err));
+    if (deletedTasksCount > 0) {
+      db.tasks.bulkDelete(tasksToDelete.map((t) => t.id)).catch((err) => console.warn('Dexie tasks delete error:', err));
+    }
+
+    // Queue sync to Supabase
+    syncService.queueRecord('projects', 'delete', { id });
+    tasksToDelete.forEach((t) => {
+      syncService.queueRecord('tasks', 'delete', { id: t.id });
+    });
+
+    return { success: true, deletedTasksCount };
+  }
+
+  public toggleArchiveProject(id: string): Project | null {
+    const project = this.state.projects.find((p) => p.id === id);
+    if (!project) return null;
+    const isNowArchived = project.status !== 'archived';
+    project.status = isNowArchived ? 'archived' : 'in_progress';
+    project.isArchived = isNowArchived;
+    project.updatedAt = new Date().toISOString();
+    sound.playPop();
+    this.saveState();
+    db.projects.put(project).catch(console.warn);
+    syncService.queueRecord('projects', 'update', project);
+    return project;
   }
 
   public toggleObjective(projectId: string, objectiveId: string): boolean {
@@ -458,13 +614,52 @@ export class StorageManager {
     const total = project.objectives.length;
     const done = project.objectives.filter((o) => o.completed).length;
     project.progress = total > 0 ? Math.round((done / total) * 100) : 0;
-    if (project.progress === 100) {
+    if (project.progress === 100 && project.status !== 'archived') {
       project.status = 'completed';
       sound.playComplete();
     } else {
       sound.playClick();
     }
+    project.updatedAt = new Date().toISOString();
     this.saveState();
+    db.projects.put(project).catch(console.warn);
+    syncService.queueRecord('projects', 'update', project);
+    return true;
+  }
+
+  public addObjective(projectId: string, title: string): boolean {
+    const project = this.state.projects.find((p) => p.id === projectId);
+    if (!project || !title.trim()) return false;
+    project.objectives.push({
+      id: `obj-${Date.now()}-${Math.random().toString(36).substr(2, 4)}`,
+      title: title.trim(),
+      completed: false,
+    });
+    // Recalculate progress
+    const total = project.objectives.length;
+    const done = project.objectives.filter((o) => o.completed).length;
+    project.progress = total > 0 ? Math.round((done / total) * 100) : 0;
+    project.updatedAt = new Date().toISOString();
+    sound.playPop();
+    this.saveState();
+    db.projects.put(project).catch(console.warn);
+    syncService.queueRecord('projects', 'update', project);
+    return true;
+  }
+
+  public deleteObjective(projectId: string, objectiveId: string): boolean {
+    const project = this.state.projects.find((p) => p.id === projectId);
+    if (!project) return false;
+    project.objectives = project.objectives.filter((o) => o.id !== objectiveId);
+    // Recalculate progress
+    const total = project.objectives.length;
+    const done = project.objectives.filter((o) => o.completed).length;
+    project.progress = total > 0 ? Math.round((done / total) * 100) : 0;
+    project.updatedAt = new Date().toISOString();
+    sound.playClick();
+    this.saveState();
+    db.projects.put(project).catch(console.warn);
+    syncService.queueRecord('projects', 'update', project);
     return true;
   }
 

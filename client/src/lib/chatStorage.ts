@@ -24,10 +24,10 @@ function createInitialDefaultThread(): AIChatThread {
         role: 'assistant',
         content:
           lang === 'ru'
-            ? `⚡ **Приветствую, Сардор!** Я **Nova** — твой персональный ИИ-ассистент в системе **Sardor OS**.
+            ? `⚡ **Приветствую, Сардор!** Я **Nova** — твой персональный ИИ-ассистент в системе **Zing**.
 
 Чем могу помочь сегодня? Вы можете писать код, разбирать алгоритмы, анализировать продуктивность или создавать фотореалистичные изображения и видео через **Google AI Studio & Veo**!`
-            : `⚡ **Greetings, Sardor!** I am **Nova** — your personal intelligent AI assistant in **Sardor OS**.
+            : `⚡ **Greetings, Sardor!** I am **Nova** — your personal intelligent AI assistant in **Zing**.
 
 How can I assist you today? You can write code, analyze algorithms, brainstorm architectures, or generate high-quality media with **Google AI Studio & Veo**!`,
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),

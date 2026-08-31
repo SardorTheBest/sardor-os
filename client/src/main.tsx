@@ -3,16 +3,16 @@ import ReactDOM from 'react-dom/client';
 import App from './App';
 import './index.css';
 
-// Register Service Worker for offline PWA functionality
-if ('serviceWorker' in navigator && process.env.NODE_ENV === 'production') {
+// Register Service Worker for offline PWA and background push reminders
+if (typeof window !== 'undefined' && 'serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker
       .register('/sw.js')
       .then((reg) => {
-        console.log('Zenith PWA ServiceWorker registered: ', reg.scope);
+        console.log('Zenith PWA & Notification ServiceWorker registered: ', reg.scope);
       })
       .catch((err) => {
-        console.warn('Zenith PWA ServiceWorker registration failed: ', err);
+        console.warn('Zenith PWA ServiceWorker registration notice: ', err);
       });
   });
 }

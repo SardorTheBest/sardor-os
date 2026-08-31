@@ -47,6 +47,7 @@ import { chatStorage } from '../lib/chatStorage';
 import { sound } from '../lib/sound';
 import { i18n } from '../lib/i18n';
 import { AISettingsModal } from './AISettingsModal';
+import { MarkdownRenderer } from './MarkdownRenderer';
 
 interface AIAnalystModuleProps {
   state: AppState;
@@ -149,11 +150,18 @@ export const AIAnalystModule: React.FC<AIAnalystModuleProps> = ({ state, onNavig
   const handleSelectThread = (id: string) => {
     chatStorage.setActiveThreadId(id);
     sound.playClick();
+    // Auto close sidebar on mobile screen
+    if (window.innerWidth < 768) {
+      setIsSidebarOpen(false);
+    }
   };
 
   const handleCreateNewChat = () => {
     chatStorage.createThread();
     sound.playPop();
+    if (window.innerWidth < 768) {
+      setIsSidebarOpen(false);
+    }
     if (textareaRef.current) {
       textareaRef.current.focus();
     }
@@ -508,22 +516,22 @@ export const AIAnalystModule: React.FC<AIAnalystModuleProps> = ({ state, onNavig
   return (
     <div className="flex flex-col h-[calc(100vh-4.5rem)] -m-4 md:-m-8 bg-[#060e20] text-[#dae2fd] overflow-hidden select-none">
       {/* Top Studio Mode Selector Header */}
-      <header className="h-14 border-b border-[#222a3d] px-4 flex items-center justify-between bg-[#0b1326]/90 backdrop-blur-md z-10 flex-shrink-0">
-        <div className="flex items-center gap-3">
+      <header className="h-14 border-b border-[#222a3d] px-3 md:px-4 flex items-center justify-between bg-[#0b1326]/90 backdrop-blur-md z-20 flex-shrink-0 gap-2 overflow-x-auto no-scrollbar">
+        <div className="flex items-center gap-2 md:gap-3 flex-shrink-0">
           {/* History Sidebar Toggle */}
           <button
             onClick={() => setIsSidebarOpen((prev) => !prev)}
             title={isSidebarOpen ? 'Скрыть историю' : 'Показать историю'}
-            className="p-2 rounded-xl bg-[#131b2e] hover:bg-[#171f33] border border-[#222a3d] text-[#86948a] hover:text-[#dae2fd] transition-colors"
+            className="p-2 rounded-xl bg-[#131b2e] hover:bg-[#171f33] border border-[#222a3d] text-[#86948a] hover:text-[#dae2fd] transition-colors flex-shrink-0"
           >
             {isSidebarOpen ? <PanelLeftClose className="w-4 h-4" /> : <PanelLeftOpen className="w-4 h-4" />}
           </button>
 
           {/* Mode Tabs */}
-          <div className="flex items-center p-1 bg-[#131b2e] rounded-xl border border-[#222a3d]">
+          <div className="flex items-center p-1 bg-[#131b2e] rounded-xl border border-[#222a3d] flex-shrink-0">
             <button
               onClick={() => setActiveTab('chat')}
-              className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+              className={`flex items-center gap-1.5 md:gap-2 px-2.5 md:px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
                 activeTab === 'chat'
                   ? 'bg-[#00ffab]/10 text-[#00ffab] shadow-sm'
                   : 'text-[#86948a] hover:text-[#dae2fd]'
@@ -534,7 +542,7 @@ export const AIAnalystModule: React.FC<AIAnalystModuleProps> = ({ state, onNavig
             </button>
             <button
               onClick={() => setActiveTab('images')}
-              className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+              className={`flex items-center gap-1.5 md:gap-2 px-2.5 md:px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
                 activeTab === 'images'
                   ? 'bg-[#00e5ff]/10 text-[#00e5ff] shadow-sm'
                   : 'text-[#86948a] hover:text-[#dae2fd]'
@@ -545,7 +553,7 @@ export const AIAnalystModule: React.FC<AIAnalystModuleProps> = ({ state, onNavig
             </button>
             <button
               onClick={() => setActiveTab('videos')}
-              className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+              className={`flex items-center gap-1.5 md:gap-2 px-2.5 md:px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
                 activeTab === 'videos'
                   ? 'bg-[#d0bcff]/10 text-[#d0bcff] shadow-sm'
                   : 'text-[#86948a] hover:text-[#dae2fd]'
@@ -558,14 +566,14 @@ export const AIAnalystModule: React.FC<AIAnalystModuleProps> = ({ state, onNavig
         </div>
 
         {/* Right Action Tools */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5 md:gap-2 flex-shrink-0">
           {activeTab === 'chat' && (
             <>
               {/* Google Search Grounding Toggle */}
               <button
                 onClick={() => setEnableSearch((prev) => !prev)}
                 title="Поиск Google (Grounding)"
-                className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-xs font-mono border transition-all ${
+                className={`flex items-center gap-1.5 px-2 md:px-2.5 py-1.5 rounded-xl text-xs font-mono border transition-all ${
                   enableSearch
                     ? 'bg-[#00ffab]/15 border-[#00ffab]/40 text-[#00ffab]'
                     : 'bg-[#131b2e] border-[#222a3d] text-[#86948a] hover:text-[#dae2fd]'
@@ -579,7 +587,7 @@ export const AIAnalystModule: React.FC<AIAnalystModuleProps> = ({ state, onNavig
               <button
                 onClick={() => setEnableMaps((prev) => !prev)}
                 title="Карты Google (Grounding)"
-                className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-xs font-mono border transition-all ${
+                className={`flex items-center gap-1.5 px-2 md:px-2.5 py-1.5 rounded-xl text-xs font-mono border transition-all ${
                   enableMaps
                     ? 'bg-[#00e5ff]/15 border-[#00e5ff]/40 text-[#00e5ff]'
                     : 'bg-[#131b2e] border-[#222a3d] text-[#86948a] hover:text-[#dae2fd]'
@@ -608,7 +616,7 @@ export const AIAnalystModule: React.FC<AIAnalystModuleProps> = ({ state, onNavig
           {/* AI Settings Modal Trigger */}
           <button
             onClick={() => setIsSettingsOpen(true)}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#131b2e] hover:bg-[#171f33] border border-[#222a3d] text-xs font-medium text-[#dae2fd] transition-colors"
+            className="flex items-center gap-1.5 px-2.5 md:px-3 py-1.5 rounded-xl bg-[#131b2e] hover:bg-[#171f33] border border-[#222a3d] text-xs font-medium text-[#dae2fd] transition-colors"
           >
             <Settings className="w-3.5 h-3.5 text-[#00ffab]" />
             <span className="hidden sm:inline font-mono">
@@ -623,10 +631,18 @@ export const AIAnalystModule: React.FC<AIAnalystModuleProps> = ({ state, onNavig
       </header>
 
       {/* Main Full-Screen Layout Area */}
-      <div className="flex-1 flex overflow-hidden">
-        {/* Collapsible Chat History Left Sidebar */}
+      <div className="flex-1 flex overflow-hidden relative">
+        {/* Mobile Backdrop for Sidebar */}
         {activeTab === 'chat' && isSidebarOpen && (
-          <aside className="w-72 md:w-80 border-r border-[#222a3d] bg-[#060e20] flex flex-col flex-shrink-0 z-10 transition-all duration-200">
+          <div
+            onClick={() => setIsSidebarOpen(false)}
+            className="fixed inset-0 bg-black/60 backdrop-blur-xs z-30 md:hidden"
+          />
+        )}
+
+        {/* Collapsible Chat History Left Sidebar (Desktop side-by-side, Mobile overlay) */}
+        {activeTab === 'chat' && isSidebarOpen && (
+          <aside className="fixed inset-y-14 left-0 z-40 w-64 max-w-[75vw] md:static md:w-64 border-r border-[#222a3d] bg-[#060e20] flex flex-col flex-shrink-0 shadow-2xl md:shadow-none transition-all duration-200">
             {/* New Chat Button & Search */}
             <div className="p-3 space-y-2 border-b border-[#222a3d]/50">
               <button
@@ -798,9 +814,20 @@ export const AIAnalystModule: React.FC<AIAnalystModuleProps> = ({ state, onNavig
                             </div>
                           </div>
                         ) : (
-                          <div className="text-sm leading-relaxed whitespace-pre-wrap select-text font-sans">
-                            {msg.content || (
-                              <span className="text-[#86948a] italic flex items-center gap-2">
+                          <div className="select-text font-sans">
+                            {msg.content ? (
+                              isUser ? (
+                                <div className="text-sm leading-relaxed whitespace-pre-wrap">
+                                  {msg.content}
+                                </div>
+                              ) : (
+                                <MarkdownRenderer
+                                  content={msg.content}
+                                  isStreaming={isGenerating && msg.id === activeThread?.messages[activeThread.messages.length - 1]?.id}
+                                />
+                              )
+                            ) : (
+                              <span className="text-[#86948a] italic flex items-center gap-2 text-sm">
                                 <RefreshCw className="w-3.5 h-3.5 animate-spin text-[#00ffab]" />
                                 {tNova.generating}
                               </span>

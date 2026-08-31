@@ -1,31 +1,44 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
-  Activity,
   Flame,
   Plus,
   Check,
-  Award,
-  TrendingUp,
   X,
-  Sparkles,
-  Calendar,
+  BellRing,
+  Bell,
+  Clock,
+  Trash2,
+  Edit3,
 } from 'lucide-react';
 import { AppState, Habit } from '../types';
 import { storage } from '../lib/storage';
+import { notificationService } from '../lib/notificationService';
 
 interface HabitsModuleProps {
   state: AppState;
 }
 
 export const HabitsModule: React.FC<HabitsModuleProps> = ({ state }) => {
+  const isRu = state.language === 'ru';
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
-  const [isNewHabitModalOpen, setIsNewHabitModalOpen] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingHabit, setEditingHabit] = useState<Habit | null>(null);
   const [hoveredCell, setHoveredCell] = useState<{ date: string; habit: string; done: boolean } | null>(null);
 
   // Form states
   const [name, setName] = useState('');
   const [category, setCategory] = useState('Productivity');
   const [color, setColor] = useState('#4edea3');
+  const [reminderEnabled, setReminderEnabled] = useState(false);
+  const [reminderTime, setReminderTime] = useState('09:00');
+  const [permissionStatus, setPermissionStatus] = useState(notificationService.getPermissionStatus());
+
+  useEffect(() => {
+    const unsub = notificationService.onPermissionChange((status) => {
+      setPermissionStatus(status);
+    });
+    return () => unsub();
+  }, []);
 
   const todayStr = new Date().toISOString().split('T')[0];
 
@@ -50,18 +63,64 @@ export const HabitsModule: React.FC<HabitsModuleProps> = ({ state }) => {
     return true;
   });
 
-  const handleCreateHabit = (e: React.FormEvent) => {
+  const openCreateModal = () => {
+    setEditingHabit(null);
+    setName('');
+    setCategory('Productivity');
+    setColor('#4edea3');
+    setReminderEnabled(false);
+    setReminderTime('09:00');
+    setIsModalOpen(true);
+  };
+
+  const openEditModal = (habit: Habit) => {
+    setEditingHabit(habit);
+    setName(habit.name);
+    setCategory(habit.category);
+    setColor(habit.color || '#4edea3');
+    setReminderEnabled(!!habit.reminderEnabled);
+    setReminderTime(habit.reminderTime || '09:00');
+    setIsModalOpen(true);
+  };
+
+  const handleToggleReminder = async (enabled: boolean) => {
+    setReminderEnabled(enabled);
+    if (enabled && notificationService.getPermissionStatus() !== 'granted') {
+      const res = await notificationService.requestPermission();
+      setPermissionStatus(res);
+    }
+  };
+
+  const handleSaveHabit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim()) return;
-    storage.addHabit({
-      name: name.trim(),
-      category,
-      frequency: 'daily',
-      targetCount: 1,
-      color,
-    });
-    setName('');
-    setIsNewHabitModalOpen(false);
+
+    if (editingHabit) {
+      storage.updateHabit(editingHabit.id, {
+        name: name.trim(),
+        category,
+        color,
+        reminderEnabled,
+        reminderTime: reminderEnabled ? reminderTime : undefined,
+      });
+    } else {
+      storage.addHabit({
+        name: name.trim(),
+        category,
+        frequency: 'daily',
+        targetCount: 1,
+        color,
+        reminderEnabled,
+        reminderTime: reminderEnabled ? reminderTime : undefined,
+      });
+    }
+    setIsModalOpen(false);
+  };
+
+  const handleDeleteHabit = (id: string) => {
+    if (confirm(isRu ? 'Удалить эту привычку?' : 'Delete this habit?')) {
+      storage.deleteHabit(id);
+    }
   };
 
   return (
@@ -71,23 +130,25 @@ export const HabitsModule: React.FC<HabitsModuleProps> = ({ state }) => {
         <div>
           <div className="flex items-center gap-2 text-xs font-mono text-[#e5a93c] mb-1">
             <Flame className="w-4 h-4 text-[#e5a93c]" />
-            HABIT & RHYTHM TELEMETRY
+            {isRu ? 'РИТМ И ПРИВЫЧКИ' : 'HABIT & RHYTHM TELEMETRY'}
           </div>
           <h2 className="text-2xl font-bold text-[#dae2fd] font-display">
-            Daily Habits & Rhythm
+            {isRu ? 'Ежедневные Привычки' : 'Daily Habits & Rhythm'}
           </h2>
           <p className="text-xs text-[#bbcabf] font-sans mt-1">
-            Maintain momentum across cognitive, physical, and systems habits.
+            {isRu
+              ? 'Формируйте дисциплину и получайте офлайн-напоминания со звуком каждый день.'
+              : 'Maintain momentum across cognitive, physical, and systems habits with offline reminders.'}
           </p>
         </div>
 
         <div className="flex items-center gap-3">
           <button
-            onClick={() => setIsNewHabitModalOpen(true)}
+            onClick={openCreateModal}
             className="px-4 py-2 bg-[#4edea3] hover:bg-[#10b981] text-[#003824] font-semibold text-xs font-mono rounded-xl flex items-center gap-1.5 transition-all shadow-md shadow-[#4edea3]/20"
           >
             <Plus className="w-4 h-4" />
-            New Habit
+            {isRu ? 'Новая привычка' : 'New Habit'}
           </button>
         </div>
       </div>
@@ -104,7 +165,7 @@ export const HabitsModule: React.FC<HabitsModuleProps> = ({ state }) => {
                 : 'bg-[#131b2e] text-[#86948a] hover:text-[#dae2fd] border border-[#222a3d]'
             }`}
           >
-            {cat}
+            {cat === 'all' ? (isRu ? 'Все' : 'All') : cat}
           </button>
         ))}
       </div>
@@ -119,10 +180,10 @@ export const HabitsModule: React.FC<HabitsModuleProps> = ({ state }) => {
               className="p-5 rounded-2xl bg-[#131b2e] border border-[#222a3d] space-y-4 shadow-sm hover:border-[#3c4a42] transition-colors"
             >
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                <div className="flex items-center gap-3.5">
+                <div className="flex items-center gap-3.5 min-w-0 flex-1">
                   <button
                     onClick={() => storage.toggleHabitLog(habit.id, todayStr)}
-                    className={`w-9 h-9 rounded-xl flex items-center justify-center border transition-all ${
+                    className={`w-9 h-9 rounded-xl flex items-center justify-center border transition-all flex-shrink-0 ${
                       isDoneToday
                         ? 'bg-[#4edea3] text-[#003824] border-[#4edea3] shadow-md shadow-[#4edea3]/20 scale-105'
                         : 'bg-[#0b1326] border-[#222a3d] text-transparent hover:border-[#4edea3]'
@@ -131,33 +192,61 @@ export const HabitsModule: React.FC<HabitsModuleProps> = ({ state }) => {
                     <Check className="w-5 h-5 stroke-[3]" />
                   </button>
 
-                  <div>
-                    <h3 className="text-sm font-bold text-[#dae2fd]">{habit.name}</h3>
-                    <div className="flex items-center gap-2 mt-0.5">
+                  <div className="min-w-0 flex-1">
+                    <h3 className="text-sm font-bold text-[#dae2fd] truncate">{habit.name}</h3>
+                    <div className="flex flex-wrap items-center gap-2 mt-1">
                       <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-[#0b1326] text-[#89ceff] border border-[#222a3d]">
                         {habit.category}
                       </span>
                       <span className="text-[11px] font-mono text-[#e5a93c] flex items-center gap-1">
                         <Flame className="w-3 h-3 text-[#e5a93c]" />
-                        {habit.streak} day streak
+                        {habit.streak} {isRu ? 'дн. стрейк' : 'day streak'}
                       </span>
                       <span className="text-[11px] font-mono text-[#86948a]">
-                        Best: {habit.bestStreak}d
+                        {isRu ? 'Рекорд:' : 'Best:'} {habit.bestStreak}d
                       </span>
+
+                      {habit.reminderEnabled && habit.reminderTime && (
+                        <span
+                          title={`Ежедневное напоминание в ${habit.reminderTime}`}
+                          className="text-[10px] font-mono px-2 py-0.5 rounded bg-[#00ffab]/10 border border-[#00ffab]/30 text-[#00ffab] flex items-center gap-1"
+                        >
+                          <BellRing className="w-3 h-3 text-[#00ffab] animate-pulse" />
+                          <span>{habit.reminderTime}</span>
+                        </span>
+                      )}
                     </div>
                   </div>
                 </div>
 
-                <div className="text-xs font-mono text-[#86948a]">
-                  Status: {isDoneToday ? <span className="text-[#4edea3] font-bold">Verified Today</span> : 'Pending'}
+                <div className="flex items-center gap-3">
+                  <div className="text-xs font-mono text-[#86948a]">
+                    {isDoneToday ? (
+                      <span className="text-[#4edea3] font-bold">{isRu ? 'Выполнено сегодня' : 'Verified Today'}</span>
+                    ) : (
+                      <span>{isRu ? 'Ожидает' : 'Pending'}</span>
+                    )}
+                  </div>
+                  <button
+                    onClick={() => openEditModal(habit)}
+                    className="p-1.5 rounded-lg text-[#86948a] hover:text-[#dae2fd] hover:bg-[#222a3d] transition-colors"
+                  >
+                    <Edit3 className="w-4 h-4" />
+                  </button>
+                  <button
+                    onClick={() => handleDeleteHabit(habit.id)}
+                    className="p-1.5 rounded-lg text-[#86948a] hover:text-[#ffb4ab] hover:bg-[#222a3d] transition-colors"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
                 </div>
               </div>
 
               {/* 28-Day Heatmap Strip */}
               <div className="space-y-1.5 pt-2 border-t border-[#222a3d]/50">
                 <div className="flex justify-between items-center text-[10px] font-mono text-[#86948a]">
-                  <span>28 Days Activity Trail</span>
-                  <span>Today</span>
+                  <span>{isRu ? 'История активности за 28 дней' : '28 Days Activity Trail'}</span>
+                  <span>{isRu ? 'Сегодня' : 'Today'}</span>
                 </div>
 
                 <div className="grid grid-cols-28 gap-1">
@@ -195,72 +284,156 @@ export const HabitsModule: React.FC<HabitsModuleProps> = ({ state }) => {
       {hoveredCell && (
         <div className="fixed bottom-6 right-6 p-3 rounded-xl bg-[#171f33] border border-[#4edea3]/40 shadow-xl text-xs font-mono z-40">
           <div className="text-[#4edea3] font-bold">{hoveredCell.habit}</div>
-          <div className="text-[#bbcabf]">{hoveredCell.date} • {hoveredCell.done ? 'Completed' : 'Missed'}</div>
-          <div className="text-[10px] text-[#86948a] mt-1">Click square to toggle</div>
+          <div className="text-[#bbcabf]">{hoveredCell.date} • {hoveredCell.done ? (isRu ? 'Выполнено' : 'Completed') : (isRu ? 'Пропущено' : 'Missed')}</div>
+          <div className="text-[10px] text-[#86948a] mt-1">{isRu ? 'Нажмите на ячейку для переключения' : 'Click square to toggle'}</div>
         </div>
       )}
 
-      {/* New Habit Modal */}
-      {isNewHabitModalOpen && (
+      {/* Habit Create / Edit Modal */}
+      {isModalOpen && (
         <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="w-full max-w-md bg-[#131b2e] border border-[#222a3d] rounded-2xl p-6 shadow-2xl space-y-4">
             <div className="flex items-center justify-between border-b border-[#222a3d] pb-3">
-              <h3 className="text-base font-bold text-[#dae2fd] font-display">
-                Create New Habit
+              <h3 className="text-base font-bold text-[#dae2fd] font-display flex items-center gap-2">
+                <Flame className="w-5 h-5 text-[#e5a93c]" />
+                {editingHabit ? (isRu ? 'Редактировать привычку' : 'Edit Habit') : (isRu ? 'Создать привычку' : 'Create New Habit')}
               </h3>
               <button
-                onClick={() => setIsNewHabitModalOpen(false)}
+                onClick={() => setIsModalOpen(false)}
                 className="text-[#86948a] hover:text-[#dae2fd]"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            <form onSubmit={handleCreateHabit} className="space-y-4">
+            <form onSubmit={handleSaveHabit} className="space-y-4">
               <div>
                 <label className="block text-xs font-mono text-[#86948a] mb-1">
-                  HABIT NAME *
+                  {isRu ? 'НАЗВАНИЕ ПРИВЫЧКИ *' : 'HABIT NAME *'}
                 </label>
                 <input
                   type="text"
                   required
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  placeholder="e.g. 90m Deep Focus..."
+                  placeholder={isRu ? 'Например: 45м Глубокая работа...' : 'e.g. 90m Deep Focus...'}
                   className="w-full bg-[#0b1326] border border-[#222a3d] rounded-xl px-3.5 py-2 text-xs text-[#dae2fd] focus:outline-none focus:border-[#4edea3]"
                 />
               </div>
 
               <div>
                 <label className="block text-xs font-mono text-[#86948a] mb-1">
-                  CATEGORY
+                  {isRu ? 'КАТЕГОРИЯ' : 'CATEGORY'}
                 </label>
                 <select
                   value={category}
                   onChange={(e) => setCategory(e.target.value)}
                   className="w-full bg-[#0b1326] border border-[#222a3d] rounded-xl px-3 py-2 text-xs text-[#dae2fd] focus:outline-none focus:border-[#4edea3]"
                 >
-                  <option value="Productivity">Productivity</option>
-                  <option value="Mind">Mind</option>
-                  <option value="Body">Body</option>
-                  <option value="Health">Health</option>
-                  <option value="Craft">Craft</option>
+                  <option value="Productivity">{isRu ? 'Продуктивность' : 'Productivity'}</option>
+                  <option value="Mind">{isRu ? 'Разум & Фокус' : 'Mind'}</option>
+                  <option value="Body">{isRu ? 'Тело & Спорт' : 'Body'}</option>
+                  <option value="Health">{isRu ? 'Здоровье' : 'Health'}</option>
+                  <option value="Craft">{isRu ? 'Навыки & Творчество' : 'Craft'}</option>
                 </select>
+              </div>
+
+              {/* Push & Sound Reminder */}
+              <div className="bg-[#0b1326]/80 border border-[#222a3d] rounded-xl p-3.5 space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <div className="p-1.5 rounded-lg bg-[#4edea3]/10 text-[#4edea3]">
+                      <BellRing className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <div className="text-xs font-semibold text-[#dae2fd] flex items-center gap-1.5">
+                        {isRu ? 'Ежедневное Push-напоминание' : 'Daily Push Reminder'}
+                        {permissionStatus === 'granted' ? (
+                          <span className="text-[9px] font-mono px-1.5 py-0.2 rounded bg-[#4edea3]/20 text-[#4edea3]">
+                            {isRu ? 'Офлайн' : 'Offline'}
+                          </span>
+                        ) : (
+                          <span className="text-[9px] font-mono px-1.5 py-0.2 rounded bg-[#e5a93c]/20 text-[#e5a93c]">
+                            {isRu ? 'Требуется доступ' : 'Permission needed'}
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-[10px] text-[#86948a]">
+                        {isRu
+                          ? 'Звуковое оповещение в выбранное время каждый день'
+                          : 'Audio chime at scheduled time every day'}
+                      </p>
+                    </div>
+                  </div>
+
+                  <label className="relative inline-flex items-center cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={reminderEnabled}
+                      onChange={(e) => handleToggleReminder(e.target.checked)}
+                      className="sr-only peer"
+                    />
+                    <div className="w-9 h-5 bg-[#222a3d] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#4edea3]"></div>
+                  </label>
+                </div>
+
+                {reminderEnabled && (
+                  <div className="pt-2 border-t border-[#222a3d]/60 space-y-2.5">
+                    <div>
+                      <span className="text-[10px] font-mono text-[#86948a] block mb-1.5">
+                        {isRu ? 'БЫСТРЫЕ ПРЕСЕТЫ ВРЕМЕНИ' : 'TIME PRESETS'}
+                      </span>
+                      <div className="grid grid-cols-4 gap-1.5">
+                        {[
+                          { time: '08:00', label: isRu ? '08:00 Утро' : '08:00 AM' },
+                          { time: '13:00', label: isRu ? '13:00 День' : '01:00 PM' },
+                          { time: '19:00', label: isRu ? '19:00 Вечер' : '07:00 PM' },
+                          { time: '21:30', label: isRu ? '21:30 Сон' : '09:30 PM' },
+                        ].map((p) => (
+                          <button
+                            key={p.time}
+                            type="button"
+                            onClick={() => setReminderTime(p.time)}
+                            className={`py-1 px-1.5 rounded-lg text-[10px] font-mono transition-all border ${
+                              reminderTime === p.time
+                                ? 'bg-[#4edea3]/20 border-[#4edea3] text-[#4edea3] font-bold'
+                                : 'bg-[#131b2e] border-[#222a3d] text-[#86948a] hover:text-[#dae2fd]'
+                            }`}
+                          >
+                            {p.label}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-[10px] font-mono text-[#86948a] mb-1">
+                        {isRu ? 'ВРЕМЯ НАПОМИНАНИЯ' : 'EXACT TIME'}
+                      </label>
+                      <input
+                        type="time"
+                        value={reminderTime}
+                        onChange={(e) => setReminderTime(e.target.value)}
+                        className="w-full bg-[#131b2e] border border-[#222a3d] rounded-xl px-3 py-1.5 text-xs text-[#dae2fd] focus:outline-none focus:border-[#4edea3]"
+                      />
+                    </div>
+                  </div>
+                )}
               </div>
 
               <div className="flex justify-end gap-2 pt-3 border-t border-[#222a3d]">
                 <button
                   type="button"
-                  onClick={() => setIsNewHabitModalOpen(false)}
+                  onClick={() => setIsModalOpen(false)}
                   className="px-4 py-2 rounded-xl text-xs font-mono text-[#86948a] hover:bg-[#222a3d]"
                 >
-                  Cancel
+                  {isRu ? 'Отмена' : 'Cancel'}
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-[#4edea3] text-[#003824] font-mono text-xs font-semibold rounded-xl shadow-md shadow-[#4edea3]/20"
+                  className="px-4 py-2 bg-[#4edea3] hover:bg-[#10b981] text-[#003824] font-mono text-xs font-semibold rounded-xl shadow-md shadow-[#4edea3]/20 transition-all"
                 >
-                  Create Habit
+                  {editingHabit ? (isRu ? 'Сохранить' : 'Save Changes') : (isRu ? 'Создать привычку' : 'Create Habit')}
                 </button>
               </div>
             </form>

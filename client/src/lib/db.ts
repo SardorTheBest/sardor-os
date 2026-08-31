@@ -1,5 +1,5 @@
 import Dexie, { Table } from 'dexie';
-import { AIChatThread, AppState, Book, Habit, Note, Project, ReadingSession, Tag, Task, UserProfile } from '../types';
+import { AIChatThread, AppState, Book, Habit, Note, Project, ReadingSession, ScheduledReminder, Tag, Task, UserProfile } from '../types';
 
 export interface SyncRecord {
   id: string;
@@ -18,20 +18,22 @@ export class ZenithDatabase extends Dexie {
   notes!: Table<Note, string>;
   projects!: Table<Project, string>;
   aiThreads!: Table<AIChatThread, string>;
+  reminders!: Table<ScheduledReminder, string>;
   userProfile!: Table<UserProfile & { id: string }, string>;
   syncQueue!: Table<SyncRecord, string>;
 
   constructor() {
     super('ZenithPersonalOS_DB');
-    this.version(2).stores({
-      tasks: 'id, dueDate, dueTime, priority, tagId, isCompleted, updatedAt',
+    this.version(3).stores({
+      tasks: 'id, dueDate, dueTime, priority, tagId, isCompleted, updatedAt, reminderEnabled, reminderDateTime',
       tags: 'id, name, color, updatedAt',
-      habits: 'id, name, category, frequency, streak',
+      habits: 'id, name, category, frequency, streak, reminderEnabled',
       books: 'id, title, author, status, rating',
       readingSessions: 'id, bookId, timestamp',
       notes: 'id, title, category, pinned, updatedAt',
       projects: 'id, title, status, quarter, progress',
       aiThreads: 'id, title, isPinned, createdAt, updatedAt',
+      reminders: 'id, targetId, type, scheduledTime, fired',
       userProfile: 'id, name, focusMode',
       syncQueue: 'id, table, action, timestamp',
     });

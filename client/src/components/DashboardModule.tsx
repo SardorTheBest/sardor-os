@@ -144,7 +144,7 @@ export const DashboardModule: React.FC<DashboardModuleProps> = ({ state, onNavig
               </div>
 
               <h2 className="text-lg sm:text-xl font-bold text-[#dae2fd] font-display leading-snug">
-                {currentGreeting?.greeting || `Добро пожаловать в Zenith OS, ${state.user.name}!`}
+                {currentGreeting?.greeting || `Добро пожаловать в Zing OS, ${state.user.name}!`}
               </h2>
 
               <p className="text-xs text-[#bbcabf] font-sans flex items-center gap-2">

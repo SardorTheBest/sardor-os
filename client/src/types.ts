@@ -8,16 +8,36 @@ export interface Tag {
   isSynced?: boolean;
 }
 
+export interface ScheduledReminder {
+  id: string;
+  targetId: string;
+  type: 'task' | 'habit' | 'system';
+  title: string;
+  body: string;
+  scheduledTime: number; // Unix timestamp in ms
+  dueDateStr?: string;
+  dueTimeStr?: string;
+  fired: boolean;
+  createdAt: string;
+  tag?: string;
+}
+
 export interface Task {
   id: string;
   title: string;
   description?: string;
   isCompleted: boolean;
   dueDate?: string; // YYYY-MM-DD
-  dueTime?: string; // HH:MM
+  dueTime?: string; // HH:MM (legacy or fallback)
+  startTime?: string; // HH:MM
+  endTime?: string; // HH:MM
   tagId?: string;
   priority: Priority;
   projectId?: string;
+  reminderEnabled?: boolean;
+  reminderDateTime?: string; // YYYY-MM-DDTHH:mm
+  reminderPreset?: 'exact' | '15m' | '1h' | '1d';
+  reminderFired?: boolean;
   createdAt: string;
   updatedAt: string;
   isSynced?: boolean;
@@ -32,6 +52,8 @@ export interface Habit {
   color: string;
   streak: number;
   bestStreak: number;
+  reminderEnabled?: boolean;
+  reminderTime?: string; // HH:MM
   logs: Record<string, boolean>; // 'YYYY-MM-DD': boolean
   createdAt: string;
 }
@@ -47,7 +69,9 @@ export interface Book {
   id: string;
   title: string;
   author: string;
+  genre?: string;
   coverUrl?: string;
+  coverColor?: string;
   totalPages: number;
   currentPage: number;
   status: 'reading' | 'completed' | 'want_to_read';
@@ -56,6 +80,8 @@ export interface Book {
   finishDate?: string;
   quotes: BookQuote[];
   notes?: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface ReadingSession {
@@ -86,11 +112,16 @@ export interface Project {
   id: string;
   title: string;
   description: string;
-  status: 'in_progress' | 'planned' | 'completed';
+  status: 'in_progress' | 'planned' | 'completed' | 'archived';
   progress: number;
   quarter: string;
   objectives: ProjectObjective[];
   color: string;
+  icon?: string;
+  isArchived?: boolean;
+  targetDate?: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export type AIProvider = 'gemini' | 'webllm' | 'ollama' | 'groq' | 'openrouter';
@@ -152,6 +183,8 @@ export interface UserProfile {
   pinCode?: string;
   pinEnabled?: boolean;
   soundFxEnabled?: boolean;
+  notificationsEnabled?: boolean;
+  notificationSoundEnabled?: boolean;
   voiceGreetingEnabled?: boolean;
   language?: Language;
   theme?: Theme;

@@ -8,9 +8,13 @@ import {
   Activity,
   Calendar,
   Sparkles,
-  Command,
-  ArrowRight,
   Zap,
+  ArrowRight,
+  X,
+  LayoutDashboard,
+  BrainCircuit,
+  Tag,
+  Hash,
 } from 'lucide-react';
 import { AppState } from '../types';
 import { sound } from '../lib/sound';
@@ -21,6 +25,17 @@ interface CommandPaletteProps {
   state: AppState;
   onSelectView: (view: AppState['activeView']) => void;
   onOpenSync: () => void;
+}
+
+interface SpotlightItem {
+  id: string;
+  category: 'Задачи' | 'Заметки' | 'Проекты' | 'Книги' | 'Привычки' | 'Навигация' | 'Действия';
+  title: string;
+  subtitle?: string;
+  snippet?: string;
+  icon: React.ComponentType<{ className?: string }>;
+  badge?: string;
+  action: () => void;
 }
 
 export const CommandPalette: React.FC<CommandPaletteProps> = ({
@@ -40,67 +55,195 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
     }
   }, [isOpen]);
 
-  const items = useMemo(() => {
+  const items = useMemo<SpotlightItem[]>(() => {
     const q = search.toLowerCase().trim();
 
-    const navigationActions = [
-      { id: 'nav-dash', type: 'View', title: 'Dashboard', subtitle: 'Overview & Velocity', icon: Sparkles, action: () => onSelectView('dashboard') },
-      { id: 'nav-tasks', type: 'View', title: 'Tasks Orbit', subtitle: 'Unified Task Manager', icon: CheckSquare, action: () => onSelectView('tasks') },
-      { id: 'nav-cal', type: 'View', title: 'Interactive Calendar', subtitle: 'Drag & Drop Schedule', icon: Calendar, action: () => onSelectView('calendar') },
-      { id: 'nav-habits', type: 'View', title: 'Habit Matrix', subtitle: 'Consistency Heatmaps', icon: Activity, action: () => onSelectView('habits') },
-      { id: 'nav-books', type: 'View', title: 'Reading Vault', subtitle: 'Book Progress & Quotes', icon: BookOpen, action: () => onSelectView('books') },
-      { id: 'nav-notes', type: 'View', title: 'Knowledge Base', subtitle: 'Notes & Systems Architecture', icon: FileText, action: () => onSelectView('notes') },
-      { id: 'nav-projects', type: 'View', title: 'Strategic Projects', subtitle: 'Objectives & Milestones', icon: Target, action: () => onSelectView('projects') },
-      { id: 'nav-ai', type: 'View', title: 'AI Productivity Advisor', subtitle: 'Cognitive load, WebLLM, Ollama & Groq', icon: Zap, action: () => onSelectView('ai') },
-      { id: 'action-ai-habits', type: 'AI Action', title: 'AI: Анализ привычек', subtitle: 'Оценка стрейков и дисциплины через ИИ', icon: Sparkles, action: () => onSelectView('ai') },
-      { id: 'action-ai-summary', type: 'AI Action', title: 'AI: Саммари книги', subtitle: 'Главные выжимки и тезисы из чтения', icon: BookOpen, action: () => onSelectView('ai') },
-      { id: 'action-ai-rec', type: 'AI Action', title: 'AI: Рекомендации книг', subtitle: 'Подборка 3 книг на основе предпочтений', icon: Sparkles, action: () => onSelectView('ai') },
-      { id: 'action-sync', type: 'Action', title: 'Sync & Backup Center', subtitle: 'Supabase & IndexedDB Dexie', icon: Zap, action: () => onOpenSync() },
+    // 1. Core Navigation & Quick Actions
+    const navActions: SpotlightItem[] = [
+      {
+        id: 'nav-dash',
+        category: 'Навигация',
+        title: 'Дашборд',
+        subtitle: 'Главная панель управления и метрики дня',
+        icon: LayoutDashboard,
+        action: () => onSelectView('dashboard'),
+      },
+      {
+        id: 'nav-tasks',
+        category: 'Навигация',
+        title: 'Задачи & Фокус',
+        subtitle: `${state.tasks.filter((t) => !t.isCompleted).length} активных задач`,
+        icon: CheckSquare,
+        action: () => onSelectView('tasks'),
+      },
+      {
+        id: 'nav-cal',
+        category: 'Навигация',
+        title: 'Календарь',
+        subtitle: 'Расписание событий и планирование времени',
+        icon: Calendar,
+        action: () => onSelectView('calendar'),
+      },
+      {
+        id: 'nav-habits',
+        category: 'Навигация',
+        title: 'Привычки & Дисциплина',
+        subtitle: `${state.habits.length} трекеров привычек`,
+        icon: Activity,
+        action: () => onSelectView('habits'),
+      },
+      {
+        id: 'nav-books',
+        category: 'Навигация',
+        title: 'Библиотека & Reading Vault',
+        subtitle: `${state.books.length} книг в хранилище`,
+        icon: BookOpen,
+        action: () => onSelectView('books'),
+      },
+      {
+        id: 'nav-notes',
+        category: 'Навигация',
+        title: 'База знаний & Заметки',
+        subtitle: `${state.notes.length} заметок (Second Brain)`,
+        icon: FileText,
+        action: () => onSelectView('notes'),
+      },
+      {
+        id: 'nav-projects',
+        category: 'Навигация',
+        title: 'Стратегические проекты',
+        subtitle: `${state.projects.length} проектов с целями и задачами`,
+        icon: Target,
+        action: () => onSelectView('projects'),
+      },
+      {
+        id: 'nav-ai',
+        category: 'Навигация',
+        title: 'Nova AI Assistant',
+        subtitle: 'Чат, кодинг, генерация изображений и видео',
+        icon: BrainCircuit,
+        badge: 'AI',
+        action: () => onSelectView('ai'),
+      },
+      {
+        id: 'action-sync',
+        category: 'Действия',
+        title: 'Синхронизация & Бэкап',
+        subtitle: 'Резервное копирование и экспорт данных',
+        icon: Zap,
+        action: () => onOpenSync(),
+      },
+      {
+        id: 'action-test-push',
+        category: 'Действия',
+        title: 'Тест Push-уведомлений и Звука',
+        subtitle: 'Отправить локальное звуковое оповещение',
+        icon: Sparkles,
+        action: () => {
+          import('../lib/notificationService').then(({ notificationService }) => {
+            notificationService.sendTestNotification();
+          });
+        },
+      },
     ];
 
-    const taskItems = state.tasks.map((t) => ({
-      id: t.id,
-      type: 'Task',
+    // 2. Tasks Search
+    const taskItems: SpotlightItem[] = state.tasks.map((t) => ({
+      id: `task-${t.id}`,
+      category: 'Задачи',
       title: t.title,
-      subtitle: `${t.dueDate || 'No date'} • Priority: ${t.priority}`,
+      subtitle: `${t.dueDate || 'Без дедлайна'} • Приоритет: ${t.priority.toUpperCase()}${t.isCompleted ? ' (Выполнено)' : ''}`,
       icon: CheckSquare,
+      badge: t.priority,
       action: () => onSelectView('tasks'),
     }));
 
-    const bookItems = state.books.map((b) => ({
-      id: b.id,
-      type: 'Book',
+    // 3. Notes Search (Full text content search included)
+    const noteItems: SpotlightItem[] = state.notes.map((n) => {
+      let snippet = n.content.replace(/[#*`_\[\]-]/g, '').trim().slice(0, 110);
+      if (q && n.content.toLowerCase().includes(q)) {
+        const idx = n.content.toLowerCase().indexOf(q);
+        const start = Math.max(0, idx - 30);
+        const end = Math.min(n.content.length, idx + q.length + 50);
+        snippet = `...${n.content.slice(start, end).replace(/\n/g, ' ')}...`;
+      }
+
+      return {
+        id: `note-${n.id}`,
+        category: 'Заметки',
+        title: n.title,
+        subtitle: n.tags && n.tags.length > 0 ? `#${n.tags.join(' #')}` : 'Без тегов',
+        snippet,
+        icon: FileText,
+        action: () => onSelectView('notes'),
+      };
+    });
+
+    // 4. Projects Search
+    const projectItems: SpotlightItem[] = state.projects.map((p) => {
+      const pTasks = state.tasks.filter((t) => t.projectId === p.id);
+      return {
+        id: `proj-${p.id}`,
+        category: 'Проекты',
+        title: p.title,
+        subtitle: `${p.quarter} • Прогресс: ${p.progress}% • ${pTasks.length} задач`,
+        snippet: p.description || (p.objectives && p.objectives.length > 0 ? p.objectives.map(o => o.title).join(', ') : undefined),
+        icon: Target,
+        badge: `${p.progress}%`,
+        action: () => onSelectView('projects'),
+      };
+    });
+
+    // 5. Books Search
+    const bookItems: SpotlightItem[] = state.books.map((b) => ({
+      id: `book-${b.id}`,
+      category: 'Книги',
       title: b.title,
-      subtitle: `${b.author} • ${b.currentPage}/${b.totalPages} pages`,
+      subtitle: `${b.author} • стр. ${b.currentPage}/${b.totalPages}`,
+      snippet: b.quotes && b.quotes.length > 0 ? `Цитата: "${b.quotes[0]}"` : undefined,
       icon: BookOpen,
+      badge: `${Math.round((b.currentPage / (b.totalPages || 1)) * 100)}%`,
       action: () => onSelectView('books'),
     }));
 
-    const noteItems = state.notes.map((n) => ({
-      id: n.id,
-      type: 'Note',
-      title: n.title,
-      subtitle: `${n.category} • ${n.content.slice(0, 40)}...`,
-      icon: FileText,
-      action: () => onSelectView('notes'),
+    // 6. Habits Search
+    const habitItems: SpotlightItem[] = state.habits.map((h) => ({
+      id: `habit-${h.id}`,
+      category: 'Привычки',
+      title: h.name,
+      subtitle: `Стрейк: ${h.streak} дн. (рекорд: ${h.bestStreak} дн.) • ${h.frequency}`,
+      icon: Activity,
+      action: () => onSelectView('habits'),
     }));
 
-    const projectItems = state.projects.map((p) => ({
-      id: p.id,
-      type: 'Project',
-      title: p.title,
-      subtitle: `${p.quarter} • ${p.progress}% completed`,
-      icon: Target,
-      action: () => onSelectView('projects'),
-    }));
+    if (!q) {
+      // Default Spotlight view: Quick navigation + top tasks + recent notes
+      return [
+        ...navActions.slice(0, 4),
+        ...taskItems.slice(0, 3),
+        ...noteItems.slice(0, 3),
+      ];
+    }
 
-    const all = [...navigationActions, ...taskItems, ...bookItems, ...noteItems, ...projectItems];
+    // Full-text search matcher
+    const matches = (item: SpotlightItem) => {
+      const matchTitle = item.title.toLowerCase().includes(q);
+      const matchSubtitle = item.subtitle?.toLowerCase().includes(q);
+      const matchSnippet = item.snippet?.toLowerCase().includes(q);
+      const matchCategory = item.category.toLowerCase().includes(q);
+      return matchTitle || matchSubtitle || matchSnippet || matchCategory;
+    };
 
-    if (!q) return all.slice(0, 9);
+    const filtered = [
+      ...noteItems.filter(matches),
+      ...taskItems.filter(matches),
+      ...projectItems.filter(matches),
+      ...bookItems.filter(matches),
+      ...habitItems.filter(matches),
+      ...navActions.filter(matches),
+    ];
 
-    return all
-      .filter((item) => item.title.toLowerCase().includes(q) || item.subtitle.toLowerCase().includes(q))
-      .slice(0, 12);
+    return filtered.slice(0, 20);
   }, [search, state, onSelectView, onOpenSync]);
 
   useEffect(() => {
@@ -129,12 +272,26 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
 
   if (!isOpen) return null;
 
+  // Group items by category for Spotlight rendering
+  const groupedCategories = items.reduce((acc, item, index) => {
+    const cat = item.category;
+    if (!acc[cat]) acc[cat] = [];
+    acc[cat].push({ item, globalIndex: index });
+    return acc;
+  }, {} as Record<string, Array<{ item: SpotlightItem; globalIndex: number }>>);
+
   return (
-    <div className="fixed inset-0 bg-black/75 backdrop-blur-sm z-50 flex items-start justify-center pt-20 p-4">
-      <div className="w-full max-w-xl bg-[#131b2e] border border-[#222a3d] rounded-2xl shadow-2xl overflow-hidden animate-in fade-in-0 zoom-in-95 duration-150">
-        {/* Search Header */}
-        <div className="flex items-center gap-3 px-4 py-3.5 border-b border-[#222a3d] bg-[#0b1326]/60">
-          <Search className="w-5 h-5 text-[#86948a]" />
+    <div
+      onClick={onClose}
+      className="fixed inset-0 bg-black/75 backdrop-blur-md z-50 flex items-start justify-center pt-16 md:pt-24 p-3 md:p-4 animate-in fade-in-0 duration-150"
+    >
+      <div
+        onClick={(e) => e.stopPropagation()}
+        className="w-full max-w-2xl bg-[#0b1326] border border-[#222a3d] rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[80vh] animate-in zoom-in-95 duration-150"
+      >
+        {/* Spotlight Search Header */}
+        <div className="flex items-center gap-3 px-4 py-3.5 border-b border-[#222a3d] bg-[#131b2e]/70">
+          <Search className="w-5 h-5 text-[#00ffab] flex-shrink-0" />
           <input
             autoFocus
             type="text"
@@ -143,76 +300,103 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
               setSearch(e.target.value);
               setSelectedIndex(0);
             }}
-            placeholder="Type a command or search tasks, books, notes, projects..."
-            className="flex-1 bg-transparent text-sm text-[#dae2fd] placeholder-[#86948a] focus:outline-none font-sans"
+            placeholder="Поиск по задачам, заметкам, проектам, книгам..."
+            className="flex-1 bg-transparent text-sm md:text-base text-[#dae2fd] placeholder-[#86948a] focus:outline-none font-sans"
           />
-          <kbd className="px-2 py-0.5 rounded bg-[#171f33] border border-[#222a3d] text-[10px] font-mono text-[#86948a]">
+          {search && (
+            <button
+              onClick={() => setSearch('')}
+              className="p-1 rounded-lg hover:bg-[#222a3d] text-[#86948a] hover:text-[#dae2fd]"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          )}
+          <kbd className="px-2 py-0.5 rounded-lg bg-[#060e20] border border-[#222a3d] text-[10px] font-mono text-[#86948a]">
             ESC
           </kbd>
         </div>
 
-        {/* Results List */}
-        <div className="max-h-[380px] overflow-y-auto p-2 space-y-1">
+        {/* Spotlight Results List */}
+        <div className="overflow-y-auto p-2 space-y-3 custom-scrollbar flex-1">
           {items.length === 0 ? (
-            <div className="p-8 text-center text-xs font-mono text-[#86948a]">
-              No matching records found for "{search}"
+            <div className="p-12 text-center text-xs font-mono text-[#86948a]">
+              Ничего не найдено по запросу «{search}»
             </div>
           ) : (
-            items.map((item, idx) => {
-              const isSelected = idx === selectedIndex;
-              const Icon = item.icon;
-              return (
-                <div
-                  key={item.id}
-                  onClick={() => {
-                    sound.playClick();
-                    item.action();
-                    onClose();
-                  }}
-                  onMouseEnter={() => setSelectedIndex(idx)}
-                  className={`flex items-center justify-between p-2.5 rounded-xl cursor-pointer transition-all ${
-                    isSelected
-                      ? 'bg-[#171f33] text-[#00ffab] border border-[#00ffab]/30 shadow-sm'
-                      : 'text-[#bbcabf] hover:bg-[#0b1326]'
-                  }`}
-                >
-                  <div className="flex items-center gap-3 truncate">
+            Object.entries(groupedCategories).map(([categoryName, entries]) => (
+              <div key={categoryName} className="space-y-1">
+                <div className="px-3 py-1 text-[10px] font-mono uppercase tracking-wider text-[#86948a] font-semibold">
+                  {categoryName}
+                </div>
+                {entries.map(({ item, globalIndex }) => {
+                  const isSelected = globalIndex === selectedIndex;
+                  const Icon = item.icon;
+                  return (
                     <div
-                      className={`w-8 h-8 rounded-lg flex items-center justify-center border ${
+                      key={item.id}
+                      onClick={() => {
+                        sound.playClick();
+                        item.action();
+                        onClose();
+                      }}
+                      onMouseEnter={() => setSelectedIndex(globalIndex)}
+                      className={`flex items-center justify-between p-2.5 md:p-3 rounded-xl cursor-pointer transition-all ${
                         isSelected
-                          ? 'bg-[#00ffab]/10 border-[#00ffab]/30 text-[#00ffab]'
-                          : 'bg-[#0b1326] border-[#222a3d] text-[#86948a]'
+                          ? 'bg-[#171f33] text-[#00ffab] border border-[#00ffab]/30 shadow-md shadow-[#00ffab]/5'
+                          : 'text-[#bbcabf] hover:bg-[#131b2e]/60 border border-transparent'
                       }`}
                     >
-                      <Icon className="w-4 h-4" />
-                    </div>
-                    <div className="truncate">
-                      <div className="text-xs font-medium text-[#dae2fd] truncate">
-                        {item.title}
+                      <div className="flex items-start gap-3 truncate flex-1 min-w-0 pr-2">
+                        <div
+                          className={`p-2 rounded-lg flex-shrink-0 mt-0.5 ${
+                            isSelected
+                              ? 'bg-[#00ffab]/15 text-[#00ffab]'
+                              : 'bg-[#131b2e] text-[#86948a]'
+                          }`}
+                        >
+                          <Icon className="w-4 h-4" />
+                        </div>
+                        <div className="truncate flex-1 min-w-0">
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs md:text-sm font-semibold truncate font-sans">
+                              {item.title}
+                            </span>
+                            {item.badge && (
+                              <span className="text-[9px] font-mono px-1.5 py-0.2 rounded bg-[#060e20] text-[#00e5ff] border border-[#222a3d]">
+                                {item.badge}
+                              </span>
+                            )}
+                          </div>
+                          {item.subtitle && (
+                            <p className="text-[11px] text-[#86948a] truncate mt-0.5 font-sans">
+                              {item.subtitle}
+                            </p>
+                          )}
+                          {item.snippet && (
+                            <p className="text-[11px] text-[#bbcabf]/70 truncate mt-0.5 italic font-sans">
+                              {item.snippet}
+                            </p>
+                          )}
+                        </div>
                       </div>
-                      <div className="text-[10px] font-mono text-[#86948a] truncate">
-                        {item.subtitle}
-                      </div>
-                    </div>
-                  </div>
 
-                  <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-[#0b1326] text-[#86948a] border border-[#222a3d] ml-2 flex-shrink-0">
-                    {item.type}
-                  </span>
-                </div>
-              );
-            })
+                      <ArrowRight
+                        className={`w-3.5 h-3.5 flex-shrink-0 transition-transform duration-150 ${
+                          isSelected ? 'text-[#00ffab] translate-x-0.5' : 'text-transparent'
+                        }`}
+                      />
+                    </div>
+                  );
+                })}
+              </div>
+            ))
           )}
         </div>
 
-        {/* Footer Navigation Hints */}
-        <div className="px-4 py-2 bg-[#0b1326] border-t border-[#222a3d] flex items-center justify-between text-[10px] font-mono text-[#86948a]">
-          <div className="flex items-center gap-3">
-            <span>↑↓ Navigate</span>
-            <span>↵ Select</span>
-            <span>ESC Close</span>
-          </div>
-          <span className="text-[#00ffab]">Zenith Omnibar</span>
+        {/* Footer */}
+        <div className="px-4 py-2 bg-[#060e20]/80 border-t border-[#222a3d] flex items-center justify-between text-[10px] font-mono text-[#86948a]">
+          <span>↑↓ Навигация</span>
+          <span>↵ Выбрать</span>
         </div>
       </div>
     </div>

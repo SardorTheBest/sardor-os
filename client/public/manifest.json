@@ -1,7 +1,7 @@
 {
-  "name": "Zenith Personal OS • CozyRead",
-  "short_name": "Zenith OS",
-  "description": "Autonomous offline-first Deep Space Personal OS with calendar, habit heatmaps, reading vault, and AI productivity analyst for Sardor.",
+  "name": "Zing • Personal OS",
+  "short_name": "Zing",
+  "description": "Autonomous offline-first Deep Space Personal OS with calendar, habit heatmaps, reading vault, and Nova AI for Sardor.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#060e20",

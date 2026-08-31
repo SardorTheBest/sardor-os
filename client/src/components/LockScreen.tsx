@@ -47,7 +47,7 @@ export const LockScreen: React.FC<LockScreenProps> = ({ onUnlock, correctPin = '
 
         <div>
           <h2 className="text-xl font-bold text-[#dae2fd] font-display">
-            Zenith Personal OS
+            Zing Personal OS
           </h2>
           <p className="text-xs font-mono text-[#86948a] mt-1">
             Sardor • Deep Space Cockpit Locked
