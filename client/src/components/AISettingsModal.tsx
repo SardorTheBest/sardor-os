@@ -97,10 +97,10 @@ export const AISettingsModal: React.FC<AISettingsModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 bg-black/80 backdrop-blur-md z-[100] flex items-center justify-center p-4">
-      <div className="w-full max-w-2xl bg-[#0f172a] border border-[#1e293b] rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+    <div className="fixed inset-0 bg-black/80 backdrop-blur-md z-[100] flex items-center justify-center p-4 animate-modal-backdrop">
+      <div className="w-full max-w-2xl bg-[#16171A] border border-[rgba(255,255,255,0.08)] rounded-xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh] animate-modal-float">
         {/* Header */}
-        <div className="p-5 border-b border-[#1e293b] flex items-center justify-between bg-[#0b1326]/80">
+        <div className="p-5 border-b border-[rgba(255,255,255,0.08)] flex items-center justify-between bg-[#111214]">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-[#00ffab]/20 to-[#00e5ff]/20 border border-[#00ffab]/40 flex items-center justify-center text-[#00ffab]">
               <Bot className="w-6 h-6" />
@@ -111,7 +111,7 @@ export const AISettingsModal: React.FC<AISettingsModalProps> = ({
                   Нова (Nova) • Центр конфигурации ИИ
                 </h3>
                 <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-[#00ffab]/10 text-[#00ffab] border border-[#00ffab]/30">
-                  JARVIS PERSONA
+                  NOVA CORE
                 </span>
               </div>
               <p className="text-xs text-[#86948a] font-sans">
@@ -151,7 +151,7 @@ export const AISettingsModal: React.FC<AISettingsModalProps> = ({
                     PRO & MEDIA
                   </span>
                 </div>
-                <div className="text-xs font-bold text-[#dae2fd]">✨ Gemini 3.x</div>
+                <div className="text-xs font-bold text-[#dae2fd]">Gemini 3.x</div>
                 <div className="text-[10px] text-[#86948a]">Google AI Studio</div>
               </button>
 
@@ -171,7 +171,7 @@ export const AISettingsModal: React.FC<AISettingsModalProps> = ({
                     ОФЛАЙН
                   </span>
                 </div>
-                <div className="text-xs font-bold text-[#dae2fd]">📱 Gemma 2</div>
+                <div className="text-xs font-bold text-[#dae2fd]">Gemma 2</div>
                 <div className="text-[10px] text-[#86948a]">WebGPU Браузер</div>
               </button>
 
@@ -191,7 +191,7 @@ export const AISettingsModal: React.FC<AISettingsModalProps> = ({
                     LOCAL
                   </span>
                 </div>
-                <div className="text-xs font-bold text-[#dae2fd]">💻 Ollama</div>
+                <div className="text-xs font-bold text-[#dae2fd]">Ollama</div>
                 <div className="text-[10px] text-[#86948a]">ПК (11434)</div>
               </button>
 
@@ -211,7 +211,7 @@ export const AISettingsModal: React.FC<AISettingsModalProps> = ({
                     CLOUD
                   </span>
                 </div>
-                <div className="text-xs font-bold text-[#dae2fd]">🌐 Groq Cloud</div>
+                <div className="text-xs font-bold text-[#dae2fd]">Groq Cloud</div>
                 <div className="text-[10px] text-[#86948a]">GPT OSS 120B</div>
               </button>
             </div>
@@ -267,7 +267,7 @@ export const AISettingsModal: React.FC<AISettingsModalProps> = ({
                 </div>
                 <div className="p-3 rounded-lg bg-[#131b2e] border border-[#1e293b] space-y-1">
                   <div className="text-[11px] font-bold text-[#e5a93c] flex items-center gap-1.5">
-                    <Volume2 className="w-3.5 h-3.5" /> Jarvis TTS & Voice
+                    <Volume2 className="w-3.5 h-3.5" /> Nova Voice Engine
                   </div>
                   <p className="text-[10px] text-[#86948a]">
                     Живой синтез голоса Новы и распознавание речи.
@@ -348,7 +348,7 @@ export const AISettingsModal: React.FC<AISettingsModalProps> = ({
                       onClick={() => setSettings({ ...settings, ollamaUrl: '/api/ollama' })}
                       className="text-[10px] px-1.5 py-0.5 rounded bg-[#131b2e] hover:bg-[#222a3d] text-[#00ffab] border border-[#00ffab]/30"
                     >
-                      ⚡ CORS Proxy (/api/ollama)
+                      CORS Proxy (/api/ollama)
                     </button>
                     <button
                       type="button"
@@ -446,7 +446,7 @@ export const AISettingsModal: React.FC<AISettingsModalProps> = ({
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2 text-xs font-bold text-[#dae2fd]">
                 <Volume2 className="w-4 h-4 text-[#00ffab]" />
-                Настройки голоса Новы (Jarvis Voice)
+                Настройки голоса Новы (Nova Voice)
               </div>
               <button
                 type="button"

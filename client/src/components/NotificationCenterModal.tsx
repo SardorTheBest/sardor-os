@@ -89,10 +89,10 @@ export const NotificationCenterModal: React.FC<NotificationCenterModalProps> = (
   };
 
   return (
-    <div className="fixed inset-0 bg-black/80 backdrop-blur-md z-[100] flex items-center justify-center p-4">
-      <div className="w-full max-w-xl bg-[#0f172a] border border-[#1e293b] rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+    <div className="fixed inset-0 bg-black/80 backdrop-blur-md z-[100] flex items-center justify-center p-4 animate-modal-backdrop">
+      <div className="w-full max-w-xl bg-[#16171A] border border-[rgba(255,255,255,0.08)] rounded-xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh] animate-modal-float">
         {/* Header */}
-        <div className="p-5 border-b border-[#1e293b] flex items-center justify-between bg-[#0b1326]/80">
+        <div className="p-5 border-b border-[rgba(255,255,255,0.08)] flex items-center justify-between bg-[#111214]">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-[#00ffab]/20 to-[#00e5ff]/20 border border-[#00ffab]/40 flex items-center justify-center text-[#00ffab]">
               <BellRing className="w-5 h-5" />

@@ -901,7 +901,11 @@ ${state.projects.map((p) => `- ${p.title} (${p.progress}%)`).join('\n') || 'Не
           audio.onerror = () => {
             this.speakWithWebSpeech(text, onStart, onEnd);
           };
-          await audio.play();
+          try {
+            await audio.play();
+          } catch {
+            onEnd?.();
+          }
           return;
         }
       }

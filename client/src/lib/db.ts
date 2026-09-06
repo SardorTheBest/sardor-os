@@ -9,6 +9,16 @@ export interface SyncRecord {
   timestamp: string;
 }
 
+export interface BookFileRecord {
+  bookId: string;
+  fileName: string;
+  fileType: 'pdf' | 'epub' | 'fb2' | 'text';
+  fileBlob: Blob;
+  mimeType?: string;
+  size: number;
+  updatedAt: string;
+}
+
 export class ZenithDatabase extends Dexie {
   tasks!: Table<Task, string>;
   tags!: Table<Tag, string>;
@@ -21,6 +31,7 @@ export class ZenithDatabase extends Dexie {
   reminders!: Table<ScheduledReminder, string>;
   userProfile!: Table<UserProfile & { id: string }, string>;
   syncQueue!: Table<SyncRecord, string>;
+  bookFiles!: Table<BookFileRecord, string>;
 
   constructor() {
     super('ZenithPersonalOS_DB');
@@ -36,6 +47,9 @@ export class ZenithDatabase extends Dexie {
       reminders: 'id, targetId, type, scheduledTime, fired',
       userProfile: 'id, name, focusMode',
       syncQueue: 'id, table, action, timestamp',
+    });
+    this.version(4).stores({
+      bookFiles: 'bookId, fileType, updatedAt',
     });
   }
 }

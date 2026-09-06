@@ -7,7 +7,6 @@ import {
   BookOpen,
   FileText,
   Target,
-  Sparkles,
   Lock,
   Volume2,
   VolumeX,
@@ -70,7 +69,7 @@ export const Navigation: React.FC<NavigationProps> = ({
       onMouseLeave={() => setIsHovered(false)}
       className={`hidden md:flex ${
         isExpanded ? 'w-64' : 'w-20'
-      } bg-[#060e20]/95 backdrop-blur-xl border-r border-[#222a3d] flex-col justify-between flex-shrink-0 z-30 transition-all duration-200 ease-in-out select-none`}
+      } bg-[#060e20]/95 backdrop-blur-2xl border-r border-[#222a3d] flex-col justify-between flex-shrink-0 z-30 transition-[width,padding] duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] select-none will-change-[width]`}
     >
       {/* Brand & Wordmark */}
       <div className="p-4 md:p-5 border-b border-[#222a3d]/50 flex items-center justify-between">
@@ -81,7 +80,7 @@ export const Navigation: React.FC<NavigationProps> = ({
           {isExpanded && (
             <div className="hidden md:block overflow-hidden transition-opacity duration-200">
               <h1 className="font-bold text-base tracking-wider text-[#dae2fd] font-mono flex items-center gap-1.5">
-                ZING <span className="text-[10px] px-1.5 py-0.5 rounded bg-[#00ffab]/10 text-[#00ffab] font-mono border border-[#00ffab]/30">OS</span>
+                ZENITH <span className="text-[10px] px-1.5 py-0.5 rounded bg-[#00ffab]/10 text-[#00ffab] font-mono border border-[#00ffab]/30">OS</span>
               </h1>
               <p className="text-[11px] text-[#86948a] truncate font-mono mt-0.5">
                 SARDOR NEXUS
@@ -152,28 +151,8 @@ export const Navigation: React.FC<NavigationProps> = ({
         })}
       </nav>
 
-      {/* Focus Mode & User Profile Footer */}
-      <div className="p-2.5 md:p-4 border-t border-[#222a3d]/50 space-y-2.5">
-        {/* Focus Mode Button */}
-        <button
-          onClick={onToggleFocus}
-          title={user.focusMode ? tNav.focusActive : tNav.focusOrbit}
-          className={`w-full flex items-center ${
-            !isExpanded ? 'justify-center px-2' : 'justify-center md:justify-start gap-2.5 px-3'
-          } py-2 rounded-xl text-xs font-mono transition-all border ${
-            user.focusMode
-              ? 'bg-[#00ffab]/10 text-[#00ffab] border-[#00ffab]/40 shadow-sm shadow-[#00ffab]/10'
-              : 'bg-[#131b2e] text-[#86948a] border-[#222a3d] hover:text-[#dae2fd] hover:border-[#3c4a42]'
-          }`}
-        >
-          <Sparkles className={`w-4 h-4 flex-shrink-0 ${user.focusMode ? 'text-[#00ffab] animate-pulse' : ''}`} />
-          {isExpanded && (
-            <span className="hidden md:inline truncate">
-              {user.focusMode ? tNav.focusActive : tNav.focusOrbit}
-            </span>
-          )}
-        </button>
-
+      {/* Footer: Quick Utility Icons Row & User Profile */}
+      <div className="p-2.5 md:p-4 border-t border-[#222a3d]/50 space-y-3">
         {/* Quick Utility Icons Row (Sound, Shortcuts, Lock) */}
         <div className={`flex items-center ${!isExpanded ? 'flex-col gap-1' : 'justify-between px-1'} text-[#86948a]`}>
           <button

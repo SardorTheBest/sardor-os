@@ -23,8 +23,8 @@ function applyTheme(theme: Theme) {
   } else {
     root.classList.remove('light');
     root.classList.add('dark');
-    document.body.style.backgroundColor = '#0b1326';
-    document.body.style.color = '#dae2fd';
+    document.body.style.backgroundColor = '#0B0C0E';
+    document.body.style.color = '#F9FAFB';
   }
 }
 

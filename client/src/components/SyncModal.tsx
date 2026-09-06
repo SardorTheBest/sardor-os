@@ -147,10 +147,10 @@ export const SyncModal: React.FC<SyncModalProps> = ({ state, isOpen, onClose }) 
   };
 
   return (
-    <div className="fixed inset-0 bg-black/75 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="w-full max-w-xl bg-[#131b2e] border border-[#222a3d] rounded-2xl shadow-2xl overflow-hidden p-6 space-y-5 max-h-[92vh] overflow-y-auto">
+    <div className="fixed inset-0 bg-black/75 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-modal-backdrop">
+      <div className="w-full max-w-xl bg-[#16171A] border border-[rgba(255,255,255,0.08)] rounded-xl shadow-2xl overflow-hidden p-6 space-y-5 max-h-[92vh] overflow-y-auto animate-modal-float">
         {/* Header */}
-        <div className="flex items-center justify-between border-b border-[#222a3d] pb-4">
+        <div className="flex items-center justify-between border-b border-[rgba(255,255,255,0.08)] pb-4">
           <div className="flex items-center gap-2.5">
             <div className="w-9 h-9 rounded-xl bg-[#00ffab]/10 text-[#00ffab] flex items-center justify-center border border-[#00ffab]/20">
               <Cloud className="w-5 h-5" />

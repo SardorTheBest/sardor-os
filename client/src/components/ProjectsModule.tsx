@@ -33,6 +33,7 @@ import {
 import { AppState, Project, ProjectObjective, Task } from '../types';
 import { storage } from '../lib/storage';
 import { sound } from '../lib/sound';
+import { EmptyState } from './EmptyState';
 
 interface ProjectsModuleProps {
   state: AppState;
@@ -723,29 +724,25 @@ export const ProjectsModule: React.FC<ProjectsModuleProps> = ({ state, onNavigat
 
           {/* Projects Grid */}
           {filteredProjects.length === 0 ? (
-            <div className="text-center py-16 p-6 rounded-2xl bg-[#0f172a] border border-[#1e293b] space-y-3">
-              <Target className="w-10 h-10 text-[#86948a] mx-auto opacity-50" />
-              <h3 className="text-base font-bold text-[#dae2fd]">
-                {isRu ? 'Проекты не найдены' : 'No projects found'}
-              </h3>
-              <p className="text-xs text-[#86948a] max-w-sm mx-auto">
-                {filterTab === 'archived'
-                  ? isRu
-                    ? 'В архивной папке пока нет завершенных или отложенных проектов.'
-                    : 'No archived projects found.'
-                  : isRu
-                  ? 'Создайте свой первый стратегический проект, чтобы структурировать задачи и цели.'
-                  : 'Create your first strategic project to organize milestones and objectives.'}
-              </p>
-              {filterTab !== 'archived' && (
-                <button
-                  onClick={handleOpenCreateModal}
-                  className="px-4 py-2 bg-[#89ceff] text-[#001e2f] text-xs font-mono font-bold rounded-xl inline-flex items-center gap-1.5 mt-2"
-                >
-                  <Plus className="w-4 h-4" />
-                  <span>{isRu ? 'Создать проект' : 'Create Project'}</span>
-                </button>
-              )}
+            <div className="rounded-xl bg-[#16171A] border border-[rgba(255,255,255,0.08)] overflow-hidden">
+              <EmptyState
+                icon={Target}
+                title={
+                  filterTab === 'archived'
+                    ? (isRu ? 'Архив проектов пуст' : 'No Archived Projects')
+                    : searchQuery
+                    ? (isRu ? 'Проекты не найдены' : 'No Projects Found')
+                    : (isRu ? 'Проекты не созданы' : 'No Projects Yet')
+                }
+                description={
+                  filterTab === 'archived'
+                    ? (isRu ? 'В архивной папке пока нет завершенных или отложенных проектов.' : 'No archived projects found.')
+                    : (isRu ? 'Создайте стратегический проект для декомпозиции целей, этапов и задач.' : 'Create your first strategic project to organize milestones and objectives.')
+                }
+                actionLabel={filterTab !== 'archived' ? (isRu ? 'Создать проект' : 'Create Project') : undefined}
+                onAction={filterTab !== 'archived' ? handleOpenCreateModal : undefined}
+                accentColor="cyan"
+              />
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -914,9 +911,9 @@ export const ProjectsModule: React.FC<ProjectsModuleProps> = ({ state, onNavigat
 
       {/* ===================== 3. CREATE / EDIT PROJECT MODAL ===================== */}
       {isEditModalOpen && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
-          <div className="w-full max-w-lg bg-[#0f172a] border border-[#1e293b] rounded-2xl p-5 md:p-6 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto">
-            <div className="flex items-center justify-between border-b border-[#1e293b] pb-3">
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4 animate-modal-backdrop">
+          <div className="w-full max-w-lg bg-[#16171A] border border-[rgba(255,255,255,0.08)] rounded-xl p-5 md:p-6 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto animate-modal-float">
+            <div className="flex items-center justify-between border-b border-[rgba(255,255,255,0.08)] pb-3">
               <h3 className="text-base font-bold text-[#dae2fd] font-display flex items-center gap-2">
                 <Target className="w-4 h-4 text-[#89ceff]" />
                 {editingProject
@@ -1069,8 +1066,8 @@ export const ProjectsModule: React.FC<ProjectsModuleProps> = ({ state, onNavigat
 
       {/* ===================== 4. CONFIRM DELETE MODAL ===================== */}
       {projectToDelete && (
-        <div className="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-4 animate-fade-in">
-          <div className="w-full max-w-md bg-[#0f172a] border border-[#ffb4ab]/40 rounded-2xl p-6 shadow-2xl space-y-4">
+        <div className="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-4 animate-modal-backdrop">
+          <div className="w-full max-w-md bg-[#16171A] border border-[#ffb4ab]/40 rounded-xl p-6 shadow-2xl space-y-4 animate-modal-float">
             <div className="flex items-center gap-3 text-[#ffb4ab]">
               <div className="w-10 h-10 rounded-xl bg-[#ffb4ab]/10 border border-[#ffb4ab]/30 flex items-center justify-center flex-shrink-0">
                 <AlertTriangle className="w-5 h-5 text-[#ffb4ab]" />

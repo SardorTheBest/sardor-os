@@ -69,8 +69,10 @@ export const AIAnalystModule: React.FC<AIAnalystModuleProps> = ({ state, onNavig
   const [enableSearch, setEnableSearch] = useState(false);
   const [enableMaps, setEnableMaps] = useState(false);
 
-  // Chat History Sidebar State
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  // Chat History Sidebar State (Closed by default on mobile/tablets, open on desktop)
+  const [isSidebarOpen, setIsSidebarOpen] = useState(() =>
+    typeof window !== 'undefined' ? window.innerWidth >= 1024 : false
+  );
   const [searchFilter, setSearchFilter] = useState('');
   const [threads, setThreads] = useState<AIChatThread[]>(chatStorage.getThreads());
   const [activeThreadId, setActiveThreadId] = useState<string | null>(chatStorage.getActiveThreadId());
@@ -763,7 +765,7 @@ export const AIAnalystModule: React.FC<AIAnalystModuleProps> = ({ state, onNavig
                               </div>
                             ) : (
                               <div className="w-5 h-5 rounded-md bg-gradient-to-tr from-[#00ffab] to-[#00e5ff] text-[#003824] flex items-center justify-center font-bold text-[10px]">
-                                ⚡
+                                <Bot className="w-3 h-3 text-[#003824]" />
                               </div>
                             )}
                             <span className="font-semibold text-[#dae2fd]">

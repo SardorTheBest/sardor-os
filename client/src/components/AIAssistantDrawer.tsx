@@ -48,10 +48,10 @@ export const AIAssistantDrawer: React.FC<AIAssistantDrawerProps> = ({ state, onN
     {
       id: 'welcome-nova-drawer',
       role: 'assistant',
-      content: `⚡ **Nova готова к работе, Сардор!**
-- 🎯 **${state.tasks.filter((t) => !t.isCompleted).length} активных задач**
-- 🔥 **${state.habits.length} привычек**
-- 📖 **${state.books.filter((b) => b.status === 'reading').length} книг** в процессе чтения
+      content: `**Nova готова к работе, Сардор!**
+- **${state.tasks.filter((t) => !t.isCompleted).length} активных задач**
+- **${state.habits.length} привычек**
+- **${state.books.filter((b) => b.status === 'reading').length} книг** в процессе чтения
 
 Чем могу помочь?`,
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
@@ -148,7 +148,7 @@ export const AIAssistantDrawer: React.FC<AIAssistantDrawerProps> = ({ state, onN
             msg.id === assistantMessageId
               ? {
                   ...msg,
-                  content: `❌ **Ошибка подключения:** ${err.message}\n\n*Совет: переключитесь на резервный провайдер (Gemma 2 или Groq).*`,
+                  content: `**Ошибка подключения:** ${err.message}\n\n*Совет: переключитесь на резервный провайдер (Gemma 2 или Groq).*`,
                 }
               : msg
           )
@@ -199,22 +199,22 @@ export const AIAssistantDrawer: React.FC<AIAssistantDrawerProps> = ({ state, onN
   const quickActions = [
     {
       id: 'qa-habits',
-      label: '⚡ Анализ привычек',
+      label: 'Анализ привычек',
       prompt: 'Проанализируй мои текущие привычки, активность и стрейки. Дай 2-3 практических совета по удержанию дисциплины.',
     },
     {
       id: 'qa-summary',
-      label: '📖 Саммари книги',
+      label: 'Саммари книги',
       prompt: 'Сделай саммари книги, которую я сейчас читаю, выдели ключевые тезисы и выжимку главных идей.',
     },
     {
       id: 'qa-recommend',
-      label: '🎯 Что почитать дальше?',
+      label: 'Что почитать дальше?',
       prompt: 'На основе прочитанных мною книг и оценок, порекомендуй 3 книги для следующего чтения с кратким обоснованием.',
     },
     {
       id: 'qa-schedule',
-      label: '📋 План задач на день',
+      label: 'План задач на день',
       prompt: 'Посмотри мои невыполненные задачи и дедлайны. Составь структурированный план фокуса на сегодня.',
     },
   ];
@@ -263,13 +263,13 @@ export const AIAssistantDrawer: React.FC<AIAssistantDrawerProps> = ({ state, onN
                   </div>
                   <div>
                     <h3 className="text-sm font-bold text-[#dae2fd] font-display flex items-center gap-2">
-                      Нова (Nova) • Jarvis AI
+                      Нова (Nova) • ИИ Ассистент
                       <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-[#00ffab]/10 text-[#00ffab] border border-[#00ffab]/20">
                         Online
                       </span>
                     </h3>
                     <div className="text-[10px] font-mono text-[#86948a]">
-                      Zing Командный пульт: Сардор
+                      Zenith Командный пульт: Сардор
                     </div>
                   </div>
                 </div>
@@ -328,7 +328,7 @@ export const AIAssistantDrawer: React.FC<AIAssistantDrawerProps> = ({ state, onN
                       : 'text-[#86948a] hover:text-[#dae2fd]'
                   }`}
                 >
-                  ✨ Gemini
+                  Gemini
                 </button>
 
                 <button
@@ -340,7 +340,7 @@ export const AIAssistantDrawer: React.FC<AIAssistantDrawerProps> = ({ state, onN
                       : 'text-[#86948a] hover:text-[#dae2fd]'
                   }`}
                 >
-                  📱 Gemma
+                  Gemma
                 </button>
 
                 <button
@@ -352,7 +352,7 @@ export const AIAssistantDrawer: React.FC<AIAssistantDrawerProps> = ({ state, onN
                       : 'text-[#86948a] hover:text-[#dae2fd]'
                   }`}
                 >
-                  🌐 Groq
+                  Groq
                 </button>
 
                 <button
@@ -364,7 +364,7 @@ export const AIAssistantDrawer: React.FC<AIAssistantDrawerProps> = ({ state, onN
                       : 'text-[#86948a] hover:text-[#dae2fd]'
                   }`}
                 >
-                  💻 Ollama
+                  Ollama
                 </button>
               </div>
             </div>

@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   FileText,
   Plus,
@@ -25,6 +25,7 @@ import {
 import { AppState, Note } from '../types';
 import { storage } from '../lib/storage';
 import { MarkdownRenderer } from './MarkdownRenderer';
+import { EmptyState } from './EmptyState';
 import { sound } from '../lib/sound';
 import { aiEngine } from '../lib/aiEngine';
 
@@ -47,6 +48,22 @@ export const NotesModule: React.FC<NotesModuleProps> = ({ state }) => {
   const [pinned, setPinned] = useState(false);
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  // Listen for mobile header "+" button event
+  useEffect(() => {
+    const handleNewNoteEvent = () => openNewNoteModal();
+    window.addEventListener('create-new-note', handleNewNoteEvent);
+    return () => window.removeEventListener('create-new-note', handleNewNoteEvent);
+  }, []);
+
+  // Keep selectedNote synchronized with external updates or deletions
+  useEffect(() => {
+    if (selectedNote && !state.notes.some((n) => n.id === selectedNote.id)) {
+      setSelectedNote(state.notes[0] || null);
+    } else if (!selectedNote && state.notes.length > 0) {
+      setSelectedNote(state.notes[0]);
+    }
+  }, [state.notes, selectedNote]);
 
   const filteredNotes = state.notes
     .filter((note) => {
@@ -192,8 +209,16 @@ export const NotesModule: React.FC<NotesModuleProps> = ({ state }) => {
 
           <div className="space-y-2 max-h-[calc(100vh-16rem)] overflow-y-auto pr-1 custom-scrollbar">
             {filteredNotes.length === 0 ? (
-              <div className="p-8 text-center text-xs text-[#86948a] bg-[#131b2e]/40 rounded-xl border border-[#222a3d]">
-                Заметок не найдено
+              <div className="rounded-xl bg-[#16171A] border border-[rgba(255,255,255,0.08)] overflow-hidden">
+                <EmptyState
+                  icon={FileText}
+                  title={searchQuery ? 'Заметок не найдено' : 'Заметок пока нет'}
+                  description={searchQuery ? 'Попробуйте изменить поисковый запрос или фильтр.' : 'Фиксируйте мысли, чек-листы и Markdown конспекты.'}
+                  actionLabel="Новая заметка"
+                  onAction={() => setIsNewNoteModalOpen(true)}
+                  accentColor="cyan"
+                  compact
+                />
               </div>
             ) : (
               filteredNotes.map((note) => (
@@ -239,10 +264,12 @@ export const NotesModule: React.FC<NotesModuleProps> = ({ state }) => {
           </div>
         </div>
 
-        {/* Note Workspace Pane (Visible on Desktop OR when viewing detail on Mobile) */}
+        {/* Note Workspace Pane (Full Screen Native on Mobile, Side Pane on Desktop) */}
         <div
-          className={`lg:col-span-8 p-4 md:p-6 rounded-2xl bg-[#131b2e] border border-[#222a3d] min-h-[520px] flex flex-col justify-between ${
-            !mobileShowDetail ? 'hidden lg:flex' : 'flex'
+          className={`${
+            mobileShowDetail
+              ? 'fixed inset-0 z-50 bg-[#0B0C0E] flex flex-col p-4 pt-[max(1rem,env(safe-area-inset-top))] pb-[max(1rem,env(safe-area-inset-bottom))] lg:static lg:z-auto lg:p-6 lg:rounded-2xl lg:bg-[#131b2e] lg:border lg:border-[#222a3d] lg:min-h-[520px] lg:col-span-8'
+              : 'hidden lg:flex lg:col-span-8 p-4 md:p-6 rounded-2xl bg-[#131b2e] border border-[#222a3d] min-h-[520px] flex-col justify-between'
           }`}
         >
           {selectedNote ? (
@@ -253,10 +280,10 @@ export const NotesModule: React.FC<NotesModuleProps> = ({ state }) => {
                   {/* Mobile Back Button */}
                   <button
                     onClick={() => setMobileShowDetail(false)}
-                    className="lg:hidden p-1.5 rounded-lg bg-[#0b1326] border border-[#222a3d] text-[#dae2fd] hover:text-[#00ffab]"
+                    className="lg:hidden p-2 rounded-xl bg-[#131b2e] border border-[#222a3d] text-[#dae2fd] hover:text-[#00ffab] active:scale-95 transition-all min-w-[40px] min-h-[40px] flex items-center justify-center"
                     title="Назад к списку"
                   >
-                    <ArrowLeft className="w-4 h-4" />
+                    <ArrowLeft className="w-5 h-5 text-[#00ffab]" />
                   </button>
 
                   <button
@@ -265,7 +292,7 @@ export const NotesModule: React.FC<NotesModuleProps> = ({ state }) => {
                       setSelectedNote({ ...selectedNote, pinned: !selectedNote.pinned });
                       sound.playPop();
                     }}
-                    className={`p-1.5 rounded-lg border transition-colors ${
+                    className={`p-2 rounded-xl border transition-colors min-w-[40px] min-h-[40px] flex items-center justify-center ${
                       selectedNote.pinned
                         ? 'bg-[#00ffab]/10 border-[#00ffab]/40 text-[#00ffab]'
                         : 'bg-[#0b1326] border-[#222a3d] text-[#86948a]'
@@ -283,7 +310,7 @@ export const NotesModule: React.FC<NotesModuleProps> = ({ state }) => {
                       setSelectedNote(updated);
                       storage.updateNote(selectedNote.id, { title: e.target.value });
                     }}
-                    className="bg-transparent text-base md:text-lg font-bold text-[#dae2fd] font-display focus:outline-none focus:border-b border-[#00ffab] px-1 truncate"
+                    className="bg-transparent text-base md:text-lg font-bold text-[#dae2fd] font-display focus:outline-none focus:border-b border-[#00ffab] px-1 truncate max-w-[180px] sm:max-w-xs md:max-w-md"
                   />
                 </div>
 
@@ -356,63 +383,63 @@ export const NotesModule: React.FC<NotesModuleProps> = ({ state }) => {
 
               {/* Markdown Toolbar (when in edit or split mode) */}
               {(viewMode === 'edit' || viewMode === 'split') && (
-                <div className="flex items-center gap-1 overflow-x-auto pb-1 border-b border-[#222a3d]/60 text-[#86948a]">
+                <div className="flex items-center gap-1.5 overflow-x-auto py-2 px-1 border-y border-[#222a3d]/60 bg-[#0B0C0E]/95 lg:bg-transparent backdrop-blur-sm sticky top-0 z-10 text-[#86948a] no-scrollbar flex-shrink-0">
                   <button
                     onClick={() => insertMarkdownSnippet('**', '**')}
-                    className="p-1.5 rounded hover:bg-[#0b1326] hover:text-[#00ffab] transition-colors"
+                    className="p-2 rounded-lg hover:bg-[#0b1326] hover:text-[#00ffab] active:scale-95 transition-all min-w-[36px] min-h-[36px] flex items-center justify-center"
                     title="Жирный шрифт (**text**)"
                   >
-                    <Bold className="w-3.5 h-3.5" />
+                    <Bold className="w-4 h-4" />
                   </button>
                   <button
                     onClick={() => insertMarkdownSnippet('*', '*')}
-                    className="p-1.5 rounded hover:bg-[#0b1326] hover:text-[#00ffab] transition-colors"
+                    className="p-2 rounded-lg hover:bg-[#0b1326] hover:text-[#00ffab] active:scale-95 transition-all min-w-[36px] min-h-[36px] flex items-center justify-center"
                     title="Курсив (*text*)"
                   >
-                    <Italic className="w-3.5 h-3.5" />
+                    <Italic className="w-4 h-4" />
                   </button>
                   <button
                     onClick={() => insertMarkdownSnippet('# ')}
-                    className="p-1.5 rounded hover:bg-[#0b1326] hover:text-[#00ffab] transition-colors"
+                    className="p-2 rounded-lg hover:bg-[#0b1326] hover:text-[#00ffab] active:scale-95 transition-all min-w-[36px] min-h-[36px] flex items-center justify-center"
                     title="Заголовок 1 (# Heading)"
                   >
-                    <Heading1 className="w-3.5 h-3.5" />
+                    <Heading1 className="w-4 h-4" />
                   </button>
                   <button
                     onClick={() => insertMarkdownSnippet('## ')}
-                    className="p-1.5 rounded hover:bg-[#0b1326] hover:text-[#00ffab] transition-colors"
+                    className="p-2 rounded-lg hover:bg-[#0b1326] hover:text-[#00ffab] active:scale-95 transition-all min-w-[36px] min-h-[36px] flex items-center justify-center"
                     title="Заголовок 2 (## Heading)"
                   >
-                    <Heading2 className="w-3.5 h-3.5" />
+                    <Heading2 className="w-4 h-4" />
                   </button>
-                  <div className="w-px h-4 bg-[#222a3d] mx-1" />
+                  <div className="w-px h-5 bg-[#222a3d] mx-1 flex-shrink-0" />
                   <button
                     onClick={() => insertMarkdownSnippet('- ')}
-                    className="p-1.5 rounded hover:bg-[#0b1326] hover:text-[#00ffab] transition-colors"
+                    className="p-2 rounded-lg hover:bg-[#0b1326] hover:text-[#00ffab] active:scale-95 transition-all min-w-[36px] min-h-[36px] flex items-center justify-center"
                     title="Список (- Item)"
                   >
-                    <List className="w-3.5 h-3.5" />
+                    <List className="w-4 h-4" />
                   </button>
                   <button
                     onClick={() => insertMarkdownSnippet('- [ ] ')}
-                    className="p-1.5 rounded hover:bg-[#0b1326] hover:text-[#00ffab] transition-colors"
+                    className="p-2 rounded-lg hover:bg-[#0b1326] hover:text-[#00ffab] active:scale-95 transition-all min-w-[36px] min-h-[36px] flex items-center justify-center"
                     title="Чекбокс (- [ ] Task)"
                   >
-                    <CheckSquare className="w-3.5 h-3.5" />
+                    <CheckSquare className="w-4 h-4" />
                   </button>
                   <button
                     onClick={() => insertMarkdownSnippet('```\n', '\n```')}
-                    className="p-1.5 rounded hover:bg-[#0b1326] hover:text-[#00ffab] transition-colors"
+                    className="p-2 rounded-lg hover:bg-[#0b1326] hover:text-[#00ffab] active:scale-95 transition-all min-w-[36px] min-h-[36px] flex items-center justify-center"
                     title="Блок кода (```code```)"
                   >
-                    <Code className="w-3.5 h-3.5" />
+                    <Code className="w-4 h-4" />
                   </button>
                   <button
                     onClick={() => insertMarkdownSnippet('> ')}
-                    className="p-1.5 rounded hover:bg-[#0b1326] hover:text-[#00ffab] transition-colors"
+                    className="p-2 rounded-lg hover:bg-[#0b1326] hover:text-[#00ffab] active:scale-95 transition-all min-w-[36px] min-h-[36px] flex items-center justify-center"
                     title="Цитата (> Quote)"
                   >
-                    <Quote className="w-3.5 h-3.5" />
+                    <Quote className="w-4 h-4" />
                   </button>
                 </div>
               )}
@@ -473,8 +500,15 @@ export const NotesModule: React.FC<NotesModuleProps> = ({ state }) => {
               </div>
             </div>
           ) : (
-            <div className="m-auto text-center text-xs text-[#86948a] p-8">
-              Выберите заметку из списка или создайте новую.
+            <div className="m-auto w-full py-12 flex items-center justify-center">
+              <EmptyState
+                icon={FileText}
+                title="Заметка не выбрана"
+                description="Выберите существующую заметку из списка слева для чтения и редактирования или создайте новую."
+                actionLabel="Создать заметку"
+                onAction={() => setIsNewNoteModalOpen(true)}
+                accentColor="cyan"
+              />
             </div>
           )}
         </div>
@@ -482,10 +516,10 @@ export const NotesModule: React.FC<NotesModuleProps> = ({ state }) => {
 
       {/* New Note Modal */}
       {isNewNoteModalOpen && (
-        <div className="fixed inset-0 bg-black/75 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center p-0 sm:p-4">
-          <div className="w-full max-w-lg bg-[#131b2e] border border-[#222a3d] rounded-t-3xl sm:rounded-2xl p-5 sm:p-6 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto pb-[max(1.5rem,env(safe-area-inset-bottom))]">
+        <div className="fixed inset-0 bg-black/75 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 animate-modal-backdrop">
+          <div className="w-full max-w-lg bg-[#16171A] border border-[rgba(255,255,255,0.08)] rounded-t-2xl sm:rounded-xl p-5 sm:p-6 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto pb-[max(1.5rem,env(safe-area-inset-bottom))] animate-sheet-slide sm:animate-modal-float">
             <div className="w-12 h-1 bg-[#3c4a42] rounded-full mx-auto sm:hidden mb-2" />
-            <div className="flex items-center justify-between border-b border-[#222a3d] pb-3">
+            <div className="flex items-center justify-between border-b border-[rgba(255,255,255,0.08)] pb-3">
               <h3 className="text-base font-bold text-[#dae2fd] font-display">
                 Создать новую заметку
               </h3>

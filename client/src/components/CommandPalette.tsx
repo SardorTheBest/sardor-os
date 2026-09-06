@@ -15,6 +15,9 @@ import {
   BrainCircuit,
   Tag,
   Hash,
+  Mic,
+  Moon,
+  Headphones,
 } from 'lucide-react';
 import { AppState } from '../types';
 import { sound } from '../lib/sound';
@@ -25,6 +28,9 @@ interface CommandPaletteProps {
   state: AppState;
   onSelectView: (view: AppState['activeView']) => void;
   onOpenSync: () => void;
+  onOpenVoiceInput?: () => void;
+  onOpenDeepWork?: () => void;
+  onOpenEveningReview?: () => void;
 }
 
 interface SpotlightItem {
@@ -44,6 +50,9 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
   state,
   onSelectView,
   onOpenSync,
+  onOpenVoiceInput,
+  onOpenDeepWork,
+  onOpenEveningReview,
 }) => {
   const [search, setSearch] = useState('');
   const [selectedIndex, setSelectedIndex] = useState(0);
@@ -124,6 +133,42 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
         icon: BrainCircuit,
         badge: 'AI',
         action: () => onSelectView('ai'),
+      },
+      {
+        id: 'action-voice',
+        category: 'Действия',
+        title: 'Голосовой Flow-Ввод (Voice-to-Action)',
+        subtitle: 'Диктуйте задачи, книги, заметки и привычки голосом',
+        icon: Mic,
+        badge: 'FLOW',
+        action: () => {
+          onClose();
+          onOpenVoiceInput?.();
+        },
+      },
+      {
+        id: 'action-deep-work',
+        category: 'Действия',
+        title: 'Режим Deep Work Zen',
+        subtitle: 'Полноэкранный таймер погружения с генератором звуков природы',
+        icon: Headphones,
+        badge: 'ZEN',
+        action: () => {
+          onClose();
+          onOpenDeepWork?.();
+        },
+      },
+      {
+        id: 'action-evening-review',
+        category: 'Действия',
+        title: 'Вечерний ИИ-Дайджест (Daily Review)',
+        subtitle: 'Итоги дня и перенос невыполненных задач на завтра',
+        icon: Moon,
+        badge: '21:00',
+        action: () => {
+          onClose();
+          onOpenEveningReview?.();
+        },
       },
       {
         id: 'action-sync',
@@ -303,6 +348,18 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
             placeholder="Поиск по задачам, заметкам, проектам, книгам..."
             className="flex-1 bg-transparent text-sm md:text-base text-[#dae2fd] placeholder-[#86948a] focus:outline-none font-sans"
           />
+          {onOpenVoiceInput && (
+            <button
+              onClick={() => {
+                onClose();
+                onOpenVoiceInput();
+              }}
+              title="Голосовой ввод"
+              className="p-1.5 rounded-lg bg-[#00ffab]/10 hover:bg-[#00ffab]/20 text-[#00ffab] border border-[#00ffab]/30 transition-all"
+            >
+              <Mic className="w-4 h-4" />
+            </button>
+          )}
           {search && (
             <button
               onClick={() => setSearch('')}

@@ -13,6 +13,7 @@ import {
 import { AppState, Habit } from '../types';
 import { storage } from '../lib/storage';
 import { notificationService } from '../lib/notificationService';
+import { EmptyState } from './EmptyState';
 
 interface HabitsModuleProps {
   state: AppState;
@@ -172,7 +173,23 @@ export const HabitsModule: React.FC<HabitsModuleProps> = ({ state }) => {
 
       {/* Habits Grid */}
       <div className="space-y-4">
-        {filteredHabits.map((habit) => {
+        {filteredHabits.length === 0 ? (
+          <div className="rounded-xl bg-[#16171A] border border-[rgba(255,255,255,0.08)] overflow-hidden">
+            <EmptyState
+              icon={Flame}
+              title={selectedCategory === 'all' ? (isRu ? 'Привычек пока нет' : 'No Habits Yet') : (isRu ? 'В этой категории нет привычек' : 'No habits in this category')}
+              description={
+                isRu
+                  ? 'Формируйте полезные микро-ритуалы и отслеживайте непрерывный стрейк каждый день.'
+                  : 'Build steady routines and track your daily consistency streak.'
+              }
+              actionLabel={isRu ? 'Создать первую привычку' : 'Create Habit'}
+              onAction={openCreateModal}
+              accentColor="emerald"
+            />
+          </div>
+        ) : (
+          filteredHabits.map((habit) => {
           const isDoneToday = !!habit.logs[todayStr];
           return (
             <div
@@ -277,13 +294,13 @@ export const HabitsModule: React.FC<HabitsModuleProps> = ({ state }) => {
               </div>
             </div>
           );
-        })}
+        }))}
       </div>
 
       {/* Heatmap Tooltip overlay */}
       {hoveredCell && (
-        <div className="fixed bottom-6 right-6 p-3 rounded-xl bg-[#171f33] border border-[#4edea3]/40 shadow-xl text-xs font-mono z-40">
-          <div className="text-[#4edea3] font-bold">{hoveredCell.habit}</div>
+        <div className="fixed bottom-6 right-6 p-3 rounded-xl bg-[#16171A] border border-[#10B981]/40 shadow-xl text-xs font-mono z-40">
+          <div className="text-[#10B981] font-bold">{hoveredCell.habit}</div>
           <div className="text-[#bbcabf]">{hoveredCell.date} • {hoveredCell.done ? (isRu ? 'Выполнено' : 'Completed') : (isRu ? 'Пропущено' : 'Missed')}</div>
           <div className="text-[10px] text-[#86948a] mt-1">{isRu ? 'Нажмите на ячейку для переключения' : 'Click square to toggle'}</div>
         </div>
@@ -291,9 +308,9 @@ export const HabitsModule: React.FC<HabitsModuleProps> = ({ state }) => {
 
       {/* Habit Create / Edit Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="w-full max-w-md bg-[#131b2e] border border-[#222a3d] rounded-2xl p-6 shadow-2xl space-y-4">
-            <div className="flex items-center justify-between border-b border-[#222a3d] pb-3">
+        <div className="fixed inset-0 bg-black/75 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-modal-backdrop">
+          <div className="w-full max-w-md bg-[#16171A] border border-[rgba(255,255,255,0.08)] rounded-xl p-6 shadow-2xl space-y-4 animate-modal-float">
+            <div className="flex items-center justify-between border-b border-[rgba(255,255,255,0.08)] pb-3">
               <h3 className="text-base font-bold text-[#dae2fd] font-display flex items-center gap-2">
                 <Flame className="w-5 h-5 text-[#e5a93c]" />
                 {editingHabit ? (isRu ? 'Редактировать привычку' : 'Edit Habit') : (isRu ? 'Создать привычку' : 'Create New Habit')}

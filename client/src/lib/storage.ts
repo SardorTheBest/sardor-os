@@ -1,10 +1,11 @@
-import { AppState, Book, BookQuote, Habit, Note, Project, ReadingSession, Tag, Task, UserProfile, AISettings, Language, Theme } from '../types';
+import { AppState, Book, BookQuote, BookChapter, BookHighlight, Habit, Note, Project, ReadingSession, Tag, Task, UserProfile, AISettings, Language, Theme, SplitViewConfig } from '../types';
 import { db } from './db';
 import { sound } from './sound';
 import { syncService } from './supabaseSync';
 import { i18n } from './i18n';
 import { themeManager } from './theme';
 import { notificationService } from './notificationService';
+import { CURATED_DEFAULT_BOOKS } from '../data/curatedBooks';
 
 const STORAGE_KEY = 'sardor_os_state_v3_clean';
 
@@ -49,9 +50,16 @@ const defaultTags: Tag[] = [
 
 const defaultTasks: Task[] = [];
 const defaultHabits: Habit[] = [];
-const defaultBooks: Book[] = [];
+const defaultBooks: Book[] = CURATED_DEFAULT_BOOKS;
 const defaultNotes: Note[] = [];
 const defaultProjects: Project[] = [];
+
+const defaultSplitView: SplitViewConfig = {
+  enabled: false,
+  leftView: 'books',
+  rightView: 'tasks',
+  ratio: 50,
+};
 
 export class StorageManager {
   private state: AppState;
@@ -76,16 +84,29 @@ export class StorageManager {
             email: 's6sarik@gmail.com',
           };
         }
+
+        // Merge books if user has no books or populate curated books if empty
+        let loadedBooks = Array.isArray(parsed.books) && parsed.books.length > 0 ? parsed.books : CURATED_DEFAULT_BOOKS;
+        // Make sure curated books exist or have chapters
+        loadedBooks = loadedBooks.map((b: Book) => {
+          const curatedMatch = CURATED_DEFAULT_BOOKS.find((cb) => cb.id === b.id);
+          if (curatedMatch && (!b.chapters || b.chapters.length === 0)) {
+            return { ...b, chapters: curatedMatch.chapters, lastReadPosition: b.lastReadPosition || curatedMatch.lastReadPosition };
+          }
+          return b;
+        });
+
         return {
           user: parsed.user || defaultUserProfile,
           tasks: parsed.tasks || defaultTasks,
           tags: parsed.tags || defaultTags,
           habits: parsed.habits || defaultHabits,
-          books: parsed.books || defaultBooks,
+          books: loadedBooks,
           readingSessions: parsed.readingSessions || [],
           notes: parsed.notes || defaultNotes,
           projects: parsed.projects || defaultProjects,
           activeView: parsed.activeView || 'dashboard',
+          splitView: parsed.splitView || defaultSplitView,
           language: i18n.getLanguage(),
           theme: themeManager.getTheme(),
         };
@@ -104,6 +125,7 @@ export class StorageManager {
       notes: defaultNotes,
       projects: defaultProjects,
       activeView: 'dashboard',
+      splitView: defaultSplitView,
       language: i18n.getLanguage(),
       theme: themeManager.getTheme(),
     };
@@ -420,6 +442,7 @@ export class StorageManager {
       sound.playClick();
       this.saveState();
       db.books.delete(id).catch((err) => console.warn('Dexie book delete error:', err));
+      db.bookFiles.delete(id).catch((err) => console.warn('Dexie bookFile delete error:', err));
       syncService.queueRecord('books', 'delete', { id });
       return true;
     }
@@ -453,9 +476,9 @@ export class StorageManager {
     return session;
   }
 
-  public addBookQuote(bookId: string, text: string, page?: number) {
+  public addBookQuote(bookId: string, text: string, page?: number): Book | undefined {
     const book = this.state.books.find((b) => b.id === bookId);
-    if (!book) return;
+    if (!book) return undefined;
     const newQuote: BookQuote = {
       id: `q-${Date.now()}-${Math.random().toString(36).substr(2, 4)}`,
       text: text.trim(),
@@ -468,17 +491,147 @@ export class StorageManager {
     this.saveState();
     db.books.put(book).catch(console.warn);
     syncService.queueRecord('books', 'update', book);
+    return book;
   }
 
-  public deleteBookQuote(bookId: string, quoteId: string) {
+  public deleteBookQuote(bookId: string, quoteId: string): Book | undefined {
     const book = this.state.books.find((b) => b.id === bookId);
-    if (!book) return;
+    if (!book) return undefined;
     book.quotes = book.quotes.filter((q) => q.id !== quoteId);
     book.updatedAt = new Date().toISOString();
     sound.playClick();
     this.saveState();
     db.books.put(book).catch(console.warn);
     syncService.queueRecord('books', 'update', book);
+    return book;
+  }
+
+  public addBookHighlight(
+    bookId: string,
+    text: string,
+    color: string,
+    noteText?: string,
+    page?: number
+  ): { book: Book; highlight: BookHighlight; noteId?: string } | undefined {
+    const book = this.state.books.find((b) => b.id === bookId);
+    if (!book) return undefined;
+
+    const highlight: BookHighlight = {
+      id: `hl-${Date.now()}-${Math.random().toString(36).substr(2, 4)}`,
+      text: text.trim(),
+      color: color || '#00ffab',
+      note: noteText?.trim() || undefined,
+      page,
+      createdAt: new Date().toISOString(),
+    };
+
+    book.highlights = [highlight, ...(book.highlights || [])];
+    book.updatedAt = new Date().toISOString();
+
+    // Link/Sync to the Book's Note in Notes collection
+    let linkedNoteId: string | undefined = undefined;
+    try {
+      const bookTag = `book-${book.id}`;
+      const noteTitle = `📖 ${book.title} — Заметки и цитаты`;
+      let targetNote = this.state.notes.find(
+        (n) => n.tags?.includes(bookTag) || n.title === noteTitle
+      );
+
+      const timestamp = new Date().toLocaleString();
+      const pageInfo = page ? ` (Стр. ${page})` : '';
+      const annotationBlock = `\n\n> **«${text.trim()}»**${pageInfo}\n${
+        noteText?.trim() ? `*Заметка:* ${noteText.trim()}\n` : ''
+      }*Цвет:* \`${color || '#00ffab'}\` • _${timestamp}_`;
+
+      if (targetNote) {
+        targetNote.content += annotationBlock;
+        targetNote.updatedAt = new Date().toISOString();
+        if (!targetNote.tags.includes(bookTag)) {
+          targetNote.tags.push(bookTag);
+        }
+        linkedNoteId = targetNote.id;
+        db.notes.put(targetNote).catch(console.warn);
+        syncService.queueRecord('notes', 'update', targetNote);
+      } else {
+        const newNote: Note = {
+          id: `note-book-${book.id}`,
+          title: noteTitle,
+          content: `# 📖 ${book.title}\n**Автор:** ${book.author}\n\n### Выделенные фрагменты и аннотации:${annotationBlock}`,
+          category: 'Книги',
+          tags: ['книги', 'чтение', bookTag],
+          pinned: false,
+          updatedAt: new Date().toISOString(),
+        };
+        this.state.notes.unshift(newNote);
+        linkedNoteId = newNote.id;
+        db.notes.put(newNote).catch(console.warn);
+        syncService.queueRecord('notes', 'insert', newNote);
+      }
+    } catch (e) {
+      console.warn('Failed to sync highlight to notes collection:', e);
+    }
+
+    sound.playPop();
+    this.saveState();
+    db.books.put(book).catch(console.warn);
+    syncService.queueRecord('books', 'update', book);
+
+    return { book, highlight, noteId: linkedNoteId };
+  }
+
+  public updateBookHighlight(
+    bookId: string,
+    highlightId: string,
+    updates: Partial<BookHighlight>
+  ): Book | undefined {
+    const book = this.state.books.find((b) => b.id === bookId);
+    if (!book || !book.highlights) return undefined;
+
+    const idx = book.highlights.findIndex((h) => h.id === highlightId);
+    if (idx === -1) return undefined;
+
+    book.highlights[idx] = {
+      ...book.highlights[idx],
+      ...updates,
+    };
+    book.updatedAt = new Date().toISOString();
+    sound.playPop();
+    this.saveState();
+    db.books.put(book).catch(console.warn);
+    syncService.queueRecord('books', 'update', book);
+    return book;
+  }
+
+  public deleteBookHighlight(bookId: string, highlightId: string): Book | undefined {
+    const book = this.state.books.find((b) => b.id === bookId);
+    if (!book) return undefined;
+    book.highlights = (book.highlights || []).filter((h) => h.id !== highlightId);
+    book.updatedAt = new Date().toISOString();
+    sound.playClick();
+    this.saveState();
+    db.books.put(book).catch(console.warn);
+    syncService.queueRecord('books', 'update', book);
+    return book;
+  }
+
+  // --- Split View Workspace ---
+  public getSplitViewConfig(): SplitViewConfig {
+    return this.state.splitView || defaultSplitView;
+  }
+
+  public setSplitViewConfig(config: Partial<SplitViewConfig>) {
+    this.state.splitView = {
+      ...(this.state.splitView || defaultSplitView),
+      ...config,
+    };
+    this.saveState();
+  }
+
+  public toggleSplitView(enabled?: boolean) {
+    const current = this.state.splitView || defaultSplitView;
+    const nextEnabled = enabled !== undefined ? enabled : !current.enabled;
+    this.setSplitViewConfig({ enabled: nextEnabled });
+    sound.playClick();
   }
 
   // --- Note CRUD ---

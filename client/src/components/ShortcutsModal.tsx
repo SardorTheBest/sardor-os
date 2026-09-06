@@ -44,9 +44,9 @@ export const ShortcutsModal: React.FC<ShortcutsModalProps> = ({ isOpen, onClose 
   ];
 
   return (
-    <div className="fixed inset-0 bg-black/75 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="w-full max-w-lg bg-[#131b2e] border border-[#222a3d] rounded-2xl p-6 shadow-2xl space-y-6">
-        <div className="flex items-center justify-between border-b border-[#222a3d] pb-4">
+    <div className="fixed inset-0 bg-black/75 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-modal-backdrop">
+      <div className="w-full max-w-lg bg-[#16171A] border border-[rgba(255,255,255,0.08)] rounded-xl p-6 shadow-2xl space-y-6 animate-modal-float">
+        <div className="flex items-center justify-between border-b border-[rgba(255,255,255,0.08)] pb-4">
           <div className="flex items-center gap-2.5">
             <div className="w-8 h-8 rounded-lg bg-[#00ffab]/10 text-[#00ffab] flex items-center justify-center border border-[#00ffab]/20">
               <Keyboard className="w-4 h-4" />

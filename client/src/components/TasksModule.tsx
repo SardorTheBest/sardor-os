@@ -18,17 +18,26 @@ import {
   Bell,
   BellRing,
   Volume2,
+  Sparkles,
+  Mic,
 } from 'lucide-react';
 import { AppState, Priority, Tag, Task } from '../types';
 import { storage } from '../lib/storage';
 import { notificationService } from '../lib/notificationService';
 import { TaskProductivityChart } from './TaskProductivityChart';
+import { EmptyState } from './EmptyState';
 
 interface TasksModuleProps {
   state: AppState;
+  onOpenDeepWork?: (task?: Task) => void;
+  onOpenVoiceInput?: () => void;
 }
 
-export const TasksModule: React.FC<TasksModuleProps> = ({ state }) => {
+export const TasksModule: React.FC<TasksModuleProps> = ({
+  state,
+  onOpenDeepWork,
+  onOpenVoiceInput,
+}) => {
   const isRu = state.language === 'ru';
   const [filterMode, setFilterMode] = useState<'all' | 'today' | 'upcoming' | 'completed'>('all');
   const [searchQuery, setSearchQuery] = useState('');
@@ -247,6 +256,16 @@ export const TasksModule: React.FC<TasksModuleProps> = ({ state }) => {
         </div>
 
         <div className="flex items-center gap-2">
+          {onOpenVoiceInput && (
+            <button
+              onClick={onOpenVoiceInput}
+              title={isRu ? 'Голосовой ввод задачи' : 'Voice Task Input'}
+              className="px-3.5 py-2 rounded-xl bg-gradient-to-r from-[#00ffab]/10 to-[#00e5ff]/10 hover:from-[#00ffab]/20 hover:to-[#00e5ff]/20 text-[#00ffab] border border-[#00ffab]/30 text-xs font-mono flex items-center gap-1.5 transition-all shadow-sm"
+            >
+              <Mic className="w-3.5 h-3.5 text-[#00ffab]" />
+              <span className="hidden sm:inline">{isRu ? 'Голосовой ввод' : 'Voice Input'}</span>
+            </button>
+          )}
           <button
             onClick={() => setIsTagManagerOpen(true)}
             className="px-3.5 py-2 rounded-xl bg-[#131b2e] hover:bg-[#171f33] text-[#bbcabf] hover:text-[#dae2fd] text-xs font-mono border border-[#222a3d] flex items-center gap-1.5 transition-colors"
@@ -322,17 +341,23 @@ export const TasksModule: React.FC<TasksModuleProps> = ({ state }) => {
       {/* Task List Rendering */}
       <div className="space-y-3">
         {filteredTasks.length === 0 ? (
-          <div className="p-12 text-center rounded-2xl bg-[#131b2e]/50 border border-dashed border-[#222a3d] space-y-3">
-            <CheckCircle2 className="w-8 h-8 text-[#86948a] mx-auto opacity-50" />
-            <p className="text-sm text-[#86948a]">
-              {isRu ? 'Задачи по указанным критериям не найдены.' : 'No tasks found matching criteria.'}
-            </p>
-            <button
-              onClick={() => openCreateModal()}
-              className="text-xs font-mono text-[#4edea3] hover:underline inline-block"
-            >
-              + {isRu ? 'Создать новую задачу' : 'Create a new task'}
-            </button>
+          <div className="rounded-xl bg-[#16171A] border border-[rgba(255,255,255,0.08)] shadow-sm overflow-hidden">
+            <EmptyState
+              icon={CheckCircle2}
+              title={
+                filterMode === 'completed'
+                  ? (isRu ? 'Нет завершенных задач' : 'No Completed Tasks Yet')
+                  : (isRu ? 'Все задачи выполнены' : 'All Tasks Completed')
+              }
+              description={
+                filterMode === 'completed'
+                  ? (isRu ? 'Завершенные задачи будут сохраняться в этой вкладке.' : 'Tasks you mark as done will appear here.')
+                  : (isRu ? 'Отличная работа! Добавьте новую задачу или посвятите время фокусу.' : 'Your task horizon is clear. Create your next priority or jump into deep work.')
+              }
+              actionLabel={isRu ? 'Создать первую задачу' : 'Create Task'}
+              onAction={() => openCreateModal()}
+              accentColor="emerald"
+            />
           </div>
         ) : (
           filteredTasks.map((task) => {
@@ -438,6 +463,16 @@ export const TasksModule: React.FC<TasksModuleProps> = ({ state }) => {
                 </div>
 
                 <div className="flex items-center gap-1 opacity-80 group-hover:opacity-100 transition-opacity">
+                  {onOpenDeepWork && !task.isCompleted && (
+                    <button
+                      onClick={() => onOpenDeepWork(task)}
+                      title={isRu ? 'Режим Погружения (Deep Work Zen)' : 'Deep Work Zen Focus'}
+                      className="p-1.5 rounded-lg text-[#00ffab] hover:bg-[#00ffab]/10 border border-[#00ffab]/20 transition-colors flex items-center gap-1 text-[11px] font-mono"
+                    >
+                      <Sparkles className="w-3.5 h-3.5 text-[#00ffab] animate-pulse" />
+                      <span className="hidden xl:inline">{isRu ? 'Фокус' : 'Focus'}</span>
+                    </button>
+                  )}
                   <button
                     onClick={() => openEditModal(task)}
                     className="p-1.5 rounded-lg text-[#86948a] hover:text-[#dae2fd] hover:bg-[#222a3d] transition-colors"
@@ -459,9 +494,18 @@ export const TasksModule: React.FC<TasksModuleProps> = ({ state }) => {
 
       {/* Task Create/Edit Modal */}
       {isCreateModalOpen && (
-        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="w-full max-w-lg bg-[#131b2e] border border-[#222a3d] rounded-2xl p-6 shadow-2xl space-y-4">
-            <div className="flex items-center justify-between border-b border-[#222a3d] pb-3">
+        <div 
+          className="fixed inset-0 bg-black/75 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 animate-modal-backdrop"
+          onClick={() => setIsCreateModalOpen(false)}
+        >
+          <div 
+            className="w-full max-w-lg bg-[#16171A] border border-[rgba(255,255,255,0.08)] rounded-t-2xl sm:rounded-xl p-5 sm:p-6 shadow-2xl space-y-4 animate-modal-float max-h-[90vh] overflow-y-auto pb-[max(1.5rem,env(safe-area-inset-bottom))]"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Mobile Drag Indicator */}
+            <div className="w-10 h-1 rounded-full bg-white/20 mx-auto -mt-1 mb-2 sm:hidden" />
+
+            <div className="flex items-center justify-between border-b border-[rgba(255,255,255,0.08)] pb-3">
               <h3 className="text-base font-bold text-[#dae2fd] font-display">
                 {editingTask
                   ? isRu
@@ -473,7 +517,7 @@ export const TasksModule: React.FC<TasksModuleProps> = ({ state }) => {
               </h3>
               <button
                 onClick={() => setIsCreateModalOpen(false)}
-                className="text-[#86948a] hover:text-[#dae2fd]"
+                className="text-[#86948a] hover:text-[#dae2fd] p-1.5 rounded-lg"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -665,17 +709,17 @@ export const TasksModule: React.FC<TasksModuleProps> = ({ state }) => {
                 )}
               </div>
 
-              <div className="flex justify-end gap-2 pt-3 border-t border-[#222a3d]">
+              <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-2 pt-3 border-t border-[#222a3d]">
                 <button
                   type="button"
                   onClick={() => setIsCreateModalOpen(false)}
-                  className="px-4 py-2 rounded-xl text-xs font-mono text-[#86948a] hover:bg-[#222a3d] transition-colors"
+                  className="w-full sm:w-auto px-4 py-2.5 rounded-xl text-xs font-mono text-[#86948a] hover:bg-[#222a3d] transition-colors min-h-[44px] flex items-center justify-center"
                 >
                   {isRu ? 'Отмена' : 'Cancel'}
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 rounded-xl text-xs font-mono font-semibold bg-[#4edea3] hover:bg-[#10b981] text-[#003824] transition-colors shadow-md shadow-[#4edea3]/20"
+                  className="w-full sm:w-auto px-5 py-2.5 rounded-xl text-xs font-mono font-semibold bg-[#4edea3] hover:bg-[#10b981] text-[#003824] transition-colors shadow-md shadow-[#4edea3]/20 min-h-[44px] flex items-center justify-center"
                 >
                   {editingTask
                     ? isRu

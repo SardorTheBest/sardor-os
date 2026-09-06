@@ -65,6 +65,21 @@ export interface BookQuote {
   createdAt: string;
 }
 
+export interface BookChapter {
+  id: string;
+  title: string;
+  content: string;
+}
+
+export interface BookHighlight {
+  id: string;
+  text: string;
+  color: string;
+  createdAt: string;
+  note?: string;
+  page?: number;
+}
+
 export interface Book {
   id: string;
   title: string;
@@ -80,8 +95,29 @@ export interface Book {
   finishDate?: string;
   quotes: BookQuote[];
   notes?: string;
+  content?: string; // Full text content
+  fileType?: 'text' | 'pdf' | 'epub' | 'fb2';
+  fileDataUrl?: string; // Data URL or object URL for uploaded PDF/EPUB/FB2
+  hasLocalFile?: boolean;
+  fileName?: string;
+  fileSize?: number;
+  chapters?: BookChapter[];
+  highlights?: BookHighlight[];
+  lastReadPosition?: number; // 0 to 100%
+  fontSize?: number;
+  readerTheme?: 'dark' | 'light' | 'sepia' | 'oled';
+  fontFamily?: 'serif' | 'sans' | 'mono';
+  readingSpeedPerHour?: number;
+  estimatedCompletionDate?: string;
   createdAt?: string;
   updatedAt?: string;
+}
+
+export interface SplitViewConfig {
+  enabled: boolean;
+  leftView: AppState['activeView'];
+  rightView: AppState['activeView'];
+  ratio: number; // percentage width for left view (e.g. 50 = 50%, 60 = 60%)
 }
 
 export interface ReadingSession {
@@ -89,6 +125,9 @@ export interface ReadingSession {
   bookId: string;
   durationMinutes: number;
   pagesRead: number;
+  startPage?: number;
+  endPage?: number;
+  speedPagesPerHour?: number;
   timestamp: string;
 }
 
@@ -129,16 +168,18 @@ export type AIProvider = 'gemini' | 'webllm' | 'ollama' | 'groq' | 'openrouter';
 export interface AISettings {
   provider: AIProvider;
   geminiModel?: string;
-  groqApiKey: string;
-  groqModel: string;
-  ollamaUrl: string;
-  ollamaModel: string;
-  webllmModel: string;
+  groqApiKey?: string;
+  groqModel?: string;
+  ollamaUrl?: string;
+  ollamaModel?: string;
+  webllmModel?: string;
   openRouterApiKey?: string;
   openRouterModel?: string;
-  temperature: number;
+  temperature?: number;
   selectedVoice?: string;
   voiceAutoSpeak?: boolean;
+  speechSpeed?: number;
+  systemPromptOverride?: string;
 }
 
 export type Language = 'ru' | 'en';
@@ -186,6 +227,7 @@ export interface UserProfile {
   notificationsEnabled?: boolean;
   notificationSoundEnabled?: boolean;
   voiceGreetingEnabled?: boolean;
+  autoStandByOnLandscape?: boolean;
   language?: Language;
   theme?: Theme;
   aiSettings?: AISettings;
@@ -201,6 +243,7 @@ export interface AppState {
   notes: Note[];
   projects: Project[];
   activeView: 'dashboard' | 'tasks' | 'calendar' | 'habits' | 'books' | 'notes' | 'projects' | 'ai';
+  splitView?: SplitViewConfig;
   language: Language;
   theme: Theme;
 }

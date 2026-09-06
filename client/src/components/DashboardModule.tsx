@@ -20,18 +20,37 @@ import {
   MessageSquare,
   Bot,
   RefreshCw,
+  Moon,
+  BrainCircuit,
+  Headphones,
+  Smartphone,
+  Radio,
 } from 'lucide-react';
 import { AppState, Priority, Task } from '../types';
 import { storage } from '../lib/storage';
 import { aiEngine } from '../lib/aiEngine';
 import { sound } from '../lib/sound';
+import { AICursorCanvas } from './AICursorCanvas';
 
 interface DashboardModuleProps {
   state: AppState;
   onNavigate: (view: AppState['activeView']) => void;
+  onOpenVoiceInput?: () => void;
+  onOpenDeepWork?: () => void;
+  onOpenEveningReview?: () => void;
+  onOpenStandBy?: () => void;
+  onOpenPairing?: () => void;
 }
 
-export const DashboardModule: React.FC<DashboardModuleProps> = ({ state, onNavigate }) => {
+export const DashboardModule: React.FC<DashboardModuleProps> = ({
+  state,
+  onNavigate,
+  onOpenVoiceInput,
+  onOpenDeepWork,
+  onOpenEveningReview,
+  onOpenStandBy,
+  onOpenPairing,
+}) => {
   const [quickTaskTitle, setQuickTaskTitle] = useState('');
   const [quickTaskPriority, setQuickTaskPriority] = useState<Priority>('medium');
   const [quickTaskTag, setQuickTaskTag] = useState(state.tags[0]?.id || '');
@@ -118,9 +137,14 @@ export const DashboardModule: React.FC<DashboardModuleProps> = ({ state, onNavig
   const activeHabitsDoneToday = state.habits.filter((h) => !!h.logs[today]).length;
 
   return (
-    <div className="space-y-6 max-w-7xl mx-auto">
+    <div className="space-y-4 sm:space-y-6 max-w-7xl mx-auto">
       {/* Nova Jarvis AI HUD Greeting Banner */}
-      <div className="relative overflow-hidden p-6 rounded-2xl bg-gradient-to-r from-[#0d1628] via-[#131d33] to-[#0f182d] border border-[#00ffab]/30 shadow-2xl">
+      <div className="relative overflow-hidden p-4 sm:p-6 rounded-2xl bg-gradient-to-r from-[#0d1628] via-[#131d33] to-[#0f182d] border border-[#00ffab]/30 shadow-2xl group">
+        {/* Interactive Neural Particles & Glowing Cursor Follower Canvas (desktop only) */}
+        <div className="hidden sm:block">
+          <AICursorCanvas className="opacity-90" />
+        </div>
+
         <div className="absolute top-0 right-0 w-96 h-96 bg-[#00ffab]/5 rounded-full blur-3xl pointer-events-none -mr-20 -mt-20" />
         <div className="absolute bottom-0 left-1/3 w-64 h-64 bg-[#00e5ff]/5 rounded-full blur-3xl pointer-events-none" />
 
@@ -136,7 +160,7 @@ export const DashboardModule: React.FC<DashboardModuleProps> = ({ state, onNavig
             <div className="space-y-1.5 min-w-0">
               <div className="flex flex-wrap items-center gap-2">
                 <span className="text-[11px] font-mono px-2 py-0.5 rounded-full bg-[#00ffab]/15 text-[#00ffab] border border-[#00ffab]/30 font-bold uppercase tracking-wider flex items-center gap-1.5">
-                  <Bot className="w-3.5 h-3.5" /> NOVA JARVIS INTELLIGENCE • ONLINE
+                  <Bot className="w-3.5 h-3.5" /> NOVA COGNITIVE INTELLIGENCE • ONLINE
                 </span>
                 <span className="text-[10px] font-mono text-[#86948a]">
                   Командный центр • Бухара, Узбекистан
@@ -144,7 +168,7 @@ export const DashboardModule: React.FC<DashboardModuleProps> = ({ state, onNavig
               </div>
 
               <h2 className="text-lg sm:text-xl font-bold text-[#dae2fd] font-display leading-snug">
-                {currentGreeting?.greeting || `Добро пожаловать в Zing OS, ${state.user.name}!`}
+                {currentGreeting?.greeting || `Добро пожаловать в Zenith OS, ${state.user.name}!`}
               </h2>
 
               <p className="text-xs text-[#bbcabf] font-sans flex items-center gap-2">
@@ -155,7 +179,7 @@ export const DashboardModule: React.FC<DashboardModuleProps> = ({ state, onNavig
             </div>
           </div>
 
-          {/* Jarvis Voice & AI Actions */}
+          {/* Nova Voice & AI Actions */}
           <div className="flex flex-wrap items-center gap-2.5 pt-2 lg:pt-0 border-t lg:border-t-0 border-[#222a3d]/80 flex-shrink-0">
             <button
               onClick={handlePlayGreeting}
@@ -195,47 +219,83 @@ export const DashboardModule: React.FC<DashboardModuleProps> = ({ state, onNavig
               className="px-4 py-2 bg-gradient-to-r from-[#00ffab] to-[#00e5ff] hover:opacity-90 text-[#003824] font-bold text-xs font-mono rounded-xl shadow-lg shadow-[#00ffab]/20 transition-all flex items-center gap-2"
             >
               <MessageSquare className="w-4 h-4" />
-              <span>Чат с Новой (Full Screen)</span>
+              <span>Ассистент Nova</span>
             </button>
           </div>
+        </div>
+
+        {/* Dynamic Cognitive Prompt Chips */}
+        <div className="relative z-10 mt-4 pt-3.5 border-t border-[#222a3d]/60 flex items-center gap-2 overflow-x-auto no-scrollbar">
+          <span className="text-[10px] font-mono text-[#86948a] uppercase tracking-wider flex-shrink-0 flex items-center gap-1">
+            <BrainCircuit className="w-3.5 h-3.5 text-[#00ffab]" />
+            Идеи для запроса:
+          </span>
+          {[
+            { label: 'Анализ продуктивности дня', prompt: 'Проведи глубокий анализ моей текущей продуктивности на сегодня, оцени распределение задач и предложи 3 точечных улучшения.' },
+            { label: 'Декомпозиция сложной цели', prompt: 'Помоги декомпозировать мою главную текущую цель на четкие 25-минутные блоки концентрации с измеримыми результатами.' },
+            { label: 'Приоритеты Эйзенхауэра', prompt: 'Разложи мои текущие задачи по 4 квадрантам матрицы Эйзенхауэра и выдели одно главное дело на сегодня.' },
+            { label: 'План спринта на неделю', prompt: 'Составь структурированный план недельного спринта с учетом привычек, чтения и дедлайнов по проектам.' },
+            { label: 'Разбор прочитанных глав', prompt: 'Дай краткую выжимку ключевых инсайтов и практических упражнений из читаемой мной книги.' },
+          ].map((chip, idx) => (
+            <button
+              key={idx}
+              onClick={() => {
+                sound.playClick();
+                storage.updateUserProfile({
+                  aiSettings: {
+                    ...state.user.aiSettings,
+                    provider: state.user.aiSettings?.provider || 'gemini',
+                    selectedVoice: state.user.aiSettings?.selectedVoice || 'Zephyr',
+                    speechSpeed: state.user.aiSettings?.speechSpeed || 1.0,
+                    systemPromptOverride: state.user.aiSettings?.systemPromptOverride || '',
+                  },
+                });
+                onNavigate('ai');
+              }}
+              className="px-3 py-1 rounded-xl bg-[#0b1326]/80 hover:bg-[#171f33] border border-[#222a3d] hover:border-[#00ffab]/40 text-xs text-[#bbcabf] hover:text-[#dae2fd] transition-all flex-shrink-0 flex items-center gap-1.5"
+            >
+              <Sparkles className="w-3 h-3 text-[#00ffab]" />
+              <span>{chip.label}</span>
+            </button>
+          ))}
         </div>
       </div>
 
       {/* Top Cockpit Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-6 rounded-2xl bg-gradient-to-r from-[#131b2e] via-[#171f33] to-[#131b2e] border border-[#222a3d] shadow-xl">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-4 sm:p-6 rounded-2xl bg-gradient-to-r from-[#131b2e] via-[#171f33] to-[#131b2e] border border-[#222a3d] shadow-xl">
         <div>
           <div className="flex items-center gap-2 text-xs font-mono text-[#4edea3] uppercase tracking-wider mb-1">
             <span className="w-2 h-2 rounded-full bg-[#4edea3] animate-pulse"></span>
             System Status: Operational • {new Date().toLocaleDateString('ru-RU', { weekday: 'long', month: 'short', day: 'numeric', year: 'numeric' })}
           </div>
-          <h2 className="text-2xl md:text-3xl font-bold text-[#dae2fd] tracking-tight font-display">
+          <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-[#dae2fd] tracking-tight font-display">
             Командный пульт: {state.user.name}
           </h2>
-          <p className="text-sm text-[#bbcabf] mt-1 font-sans">
+          <p className="text-xs sm:text-sm text-[#bbcabf] mt-1 font-sans">
             Осталось <span className="text-[#4edea3] font-semibold">{pendingTasks.length} задач</span> на сегодня, выполнено <span className="text-[#e5a93c] font-semibold">{activeHabitsDoneToday}/{state.habits.length} привычек</span>.
           </p>
         </div>
 
         {/* Quick Stat Capsules */}
-        <div className="flex items-center gap-3">
-          <div className="px-4 py-2.5 rounded-xl bg-[#0b1326]/80 border border-[#222a3d] flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-[#4edea3]/10 text-[#4edea3] flex items-center justify-center font-mono text-sm font-bold border border-[#4edea3]/20">
+        <div className="flex items-center gap-2 sm:gap-3">
+          <div className="px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl bg-[#0b1326]/80 border border-[#222a3d] flex items-center gap-2.5 sm:gap-3 flex-1 sm:flex-initial">
+            <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-[#4edea3]/10 text-[#4edea3] flex items-center justify-center font-mono text-xs sm:text-sm font-bold border border-[#4edea3]/20 flex-shrink-0">
               {completedTodayTasks.length}/{todayTasks.length}
             </div>
             <div>
-              <div className="text-[10px] text-[#86948a] uppercase font-mono tracking-wider">Задачи</div>
+              <div className="text-[9px] sm:text-[10px] text-[#86948a] uppercase font-mono tracking-wider">Задачи</div>
               <div className="text-xs font-semibold text-[#dae2fd]">
                 {todayTasks.length > 0 ? Math.round((completedTodayTasks.length / todayTasks.length) * 100) : 0}% Готово
               </div>
             </div>
           </div>
 
-          <div className="px-4 py-2.5 rounded-xl bg-[#0b1326]/80 border border-[#222a3d] flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-[#e5a93c]/10 text-[#e5a93c] flex items-center justify-center font-mono text-sm font-bold border border-[#e5a93c]/20">
-              <Flame className="w-4 h-4 text-[#e5a93c]" />
+          <div className="px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl bg-[#0b1326]/80 border border-[#222a3d] flex items-center gap-2.5 sm:gap-3 flex-1 sm:flex-initial">
+            <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-[#e5a93c]/10 text-[#e5a93c] flex items-center justify-center font-mono text-xs sm:text-sm font-bold border border-[#e5a93c]/20 flex-shrink-0">
+              <Flame className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#e5a93c]" />
             </div>
             <div>
-              <div className="text-[10px] text-[#86948a] uppercase font-mono tracking-wider">Макс. стрейк</div>
+              <div className="text-[9px] sm:text-[10px] text-[#86948a] uppercase font-mono tracking-wider">Стрейк</div>
               <div className="text-xs font-semibold text-[#dae2fd]">
                 {state.habits[0]?.streak || 0} Дней
               </div>
@@ -244,15 +304,108 @@ export const DashboardModule: React.FC<DashboardModuleProps> = ({ state, onNavig
         </div>
       </div>
 
+      {/* Quick Flow-Vibe Power Tools Banner (Horizontal swipe on mobile, grid on tablet/desktop) */}
+      <div className="flex overflow-x-auto no-scrollbar gap-2.5 pb-1 sm:grid sm:grid-cols-2 lg:grid-cols-5 sm:gap-3.5">
+        {/* 1. Voice-to-Action */}
+        <button
+          onClick={onOpenVoiceInput}
+          className="min-w-[150px] sm:min-w-0 flex-shrink-0 sm:flex-shrink p-3 sm:p-4 rounded-2xl bg-gradient-to-br from-[#131b2e] to-[#17223b] hover:from-[#17223b] hover:to-[#1f2e4d] border border-[#00ffab]/30 hover:border-[#00ffab]/60 transition-all text-left group shadow-lg flex items-center gap-2.5 sm:gap-3"
+        >
+          <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-[#00ffab]/20 text-[#00ffab] border border-[#00ffab]/40 flex items-center justify-center flex-shrink-0 group-hover:scale-105 transition-transform">
+            <Mic className="w-4 h-4 animate-pulse" />
+          </div>
+          <div className="min-w-0">
+            <div className="text-[11px] sm:text-xs font-mono font-bold text-[#00ffab] uppercase tracking-wider">
+              Flow-Ввод
+            </div>
+            <div className="text-[10px] sm:text-[11px] text-[#dae2fd] font-medium truncate">
+              Голосовые команды
+            </div>
+          </div>
+        </button>
+
+        {/* 2. StandBy Smart Desk */}
+        <button
+          onClick={onOpenStandBy}
+          className="min-w-[150px] sm:min-w-0 flex-shrink-0 sm:flex-shrink p-3 sm:p-4 rounded-2xl bg-gradient-to-br from-[#131b2e] to-[#17223b] hover:from-[#17223b] hover:to-[#1f2e4d] border border-[#4edea3]/30 hover:border-[#4edea3]/60 transition-all text-left group shadow-lg flex items-center gap-2.5 sm:gap-3"
+        >
+          <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-[#4edea3]/20 text-[#4edea3] border border-[#4edea3]/40 flex items-center justify-center flex-shrink-0 group-hover:scale-105 transition-transform">
+            <Smartphone className="w-4 h-4" />
+          </div>
+          <div className="min-w-0">
+            <div className="text-[11px] sm:text-xs font-mono font-bold text-[#4edea3] uppercase tracking-wider">
+              StandBy Desk
+            </div>
+            <div className="text-[10px] sm:text-[11px] text-[#dae2fd] font-medium truncate">
+              Настольный экран
+            </div>
+          </div>
+        </button>
+
+        {/* 3. Live Bridge / QR Pairing */}
+        <button
+          onClick={onOpenPairing}
+          className="min-w-[150px] sm:min-w-0 flex-shrink-0 sm:flex-shrink p-3 sm:p-4 rounded-2xl bg-gradient-to-br from-[#131b2e] to-[#17223b] hover:from-[#17223b] hover:to-[#1f2e4d] border border-[#00e5ff]/30 hover:border-[#00e5ff]/60 transition-all text-left group shadow-lg flex items-center gap-2.5 sm:gap-3"
+        >
+          <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-[#00e5ff]/20 text-[#00e5ff] border border-[#00e5ff]/40 flex items-center justify-center flex-shrink-0 group-hover:scale-105 transition-transform">
+            <Radio className="w-4 h-4 animate-pulse" />
+          </div>
+          <div className="min-w-0">
+            <div className="text-[11px] sm:text-xs font-mono font-bold text-[#00e5ff] uppercase tracking-wider">
+              QR-Мост
+            </div>
+            <div className="text-[10px] sm:text-[11px] text-[#dae2fd] font-medium truncate">
+              Связь с телефоном
+            </div>
+          </div>
+        </button>
+
+        {/* 4. Deep Work Zen */}
+        <button
+          onClick={onOpenDeepWork}
+          className="min-w-[150px] sm:min-w-0 flex-shrink-0 sm:flex-shrink p-3 sm:p-4 rounded-2xl bg-gradient-to-br from-[#131b2e] to-[#17223b] hover:from-[#17223b] hover:to-[#1f2e4d] border border-[#e5a93c]/30 hover:border-[#e5a93c]/60 transition-all text-left group shadow-lg flex items-center gap-2.5 sm:gap-3"
+        >
+          <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-[#e5a93c]/20 text-[#e5a93c] border border-[#e5a93c]/40 flex items-center justify-center flex-shrink-0 group-hover:scale-105 transition-transform">
+            <Headphones className="w-4 h-4" />
+          </div>
+          <div className="min-w-0">
+            <div className="text-[11px] sm:text-xs font-mono font-bold text-[#e5a93c] uppercase tracking-wider">
+              Deep Work
+            </div>
+            <div className="text-[10px] sm:text-[11px] text-[#dae2fd] font-medium truncate">
+              Фокус & Звуки
+            </div>
+          </div>
+        </button>
+
+        {/* 5. Evening AI Digest */}
+        <button
+          onClick={onOpenEveningReview}
+          className="min-w-[150px] sm:min-w-0 flex-shrink-0 sm:flex-shrink p-3 sm:p-4 rounded-2xl bg-gradient-to-br from-[#131b2e] to-[#17223b] hover:from-[#17223b] hover:to-[#1f2e4d] border border-[#d0bcff]/30 hover:border-[#d0bcff]/60 transition-all text-left group shadow-lg flex items-center gap-2.5 sm:gap-3"
+        >
+          <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-[#9333ea]/20 text-[#d0bcff] border border-[#d0bcff]/40 flex items-center justify-center flex-shrink-0 group-hover:scale-105 transition-transform">
+            <Moon className="w-4 h-4" />
+          </div>
+          <div className="min-w-0">
+            <div className="text-[11px] sm:text-xs font-mono font-bold text-[#d0bcff] uppercase tracking-wider">
+              ИИ-Дайджест
+            </div>
+            <div className="text-[10px] sm:text-[11px] text-[#dae2fd] font-medium truncate">
+              Итоги дня и перенос
+            </div>
+          </div>
+        </button>
+      </div>
+
       {/* Bento Grid Layout */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6">
         {/* Left Col (7 cols): Today's Primary Tasks */}
-        <div className="lg:col-span-7 space-y-6">
-          <div className="p-6 rounded-2xl bg-[#131b2e] border border-[#222a3d] space-y-5">
+        <div className="lg:col-span-7 space-y-4 sm:space-y-6">
+          <div className="p-4 sm:p-6 rounded-2xl bg-[#131b2e] border border-[#222a3d] space-y-4 sm:space-y-5">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <div className="w-2.5 h-2.5 rounded-full bg-[#4edea3]" />
-                <h3 className="text-lg font-bold text-[#dae2fd] font-display">
+                <h3 className="text-base sm:text-lg font-bold text-[#dae2fd] font-display">
                   Today's Execution Focus
                 </h3>
                 <span className="text-xs font-mono text-[#86948a] px-2 py-0.5 rounded-full bg-[#171f33] border border-[#222a3d]">
@@ -363,11 +516,11 @@ export const DashboardModule: React.FC<DashboardModuleProps> = ({ state, onNavig
           </div>
 
           {/* Daily Habit Rhythm Module */}
-          <div className="p-6 rounded-2xl bg-[#131b2e] border border-[#222a3d] space-y-4">
+          <div className="p-4 sm:p-6 rounded-2xl bg-[#131b2e] border border-[#222a3d] space-y-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <Flame className="w-4 h-4 text-[#e5a93c]" />
-                <h3 className="text-lg font-bold text-[#dae2fd] font-display">
+                <h3 className="text-base sm:text-lg font-bold text-[#dae2fd] font-display">
                   Daily Habit Check-in
                 </h3>
               </div>
@@ -418,14 +571,14 @@ export const DashboardModule: React.FC<DashboardModuleProps> = ({ state, onNavig
         </div>
 
         {/* Right Col (5 cols): Reading Tracker & Projects Quick View */}
-        <div className="lg:col-span-5 space-y-6">
+        <div className="lg:col-span-5 space-y-4 sm:space-y-6">
           {/* Active Reading Card */}
           {activeBook && (
-            <div className="p-6 rounded-2xl bg-[#131b2e] border border-[#222a3d] space-y-4">
+            <div className="p-4 sm:p-6 rounded-2xl bg-[#131b2e] border border-[#222a3d] space-y-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <BookOpen className="w-4 h-4 text-[#e5a93c]" />
-                  <h3 className="text-lg font-bold text-[#dae2fd] font-display">
+                  <h3 className="text-base sm:text-lg font-bold text-[#dae2fd] font-display">
                     Currently Reading
                   </h3>
                 </div>
@@ -443,7 +596,7 @@ export const DashboardModule: React.FC<DashboardModuleProps> = ({ state, onNavig
                     src={activeBook.coverUrl}
                     alt={activeBook.title}
                     referrerPolicy="no-referrer"
-                    className="w-16 h-24 object-cover rounded-lg border border-[#222a3d] shadow-md flex-shrink-0"
+                    className="w-14 h-20 sm:w-16 sm:h-24 object-cover rounded-lg border border-[#222a3d] shadow-md flex-shrink-0"
                   />
                 )}
                 <div className="min-w-0 flex-1">
@@ -495,11 +648,11 @@ export const DashboardModule: React.FC<DashboardModuleProps> = ({ state, onNavig
           )}
 
           {/* Active Objectives Overview */}
-          <div className="p-6 rounded-2xl bg-[#131b2e] border border-[#222a3d] space-y-4">
+          <div className="p-4 sm:p-6 rounded-2xl bg-[#131b2e] border border-[#222a3d] space-y-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <TrendingUp className="w-4 h-4 text-[#89ceff]" />
-                <h3 className="text-lg font-bold text-[#dae2fd] font-display">
+                <h3 className="text-base sm:text-lg font-bold text-[#dae2fd] font-display">
                   Active Objectives
                 </h3>
               </div>

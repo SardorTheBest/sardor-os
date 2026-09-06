@@ -174,8 +174,8 @@ class NotificationService {
             id: `rem-task-${task.id}`,
             targetId: task.id,
             type: 'task',
-            title: `⏰ Задача: ${task.title}`,
-            body: task.description || (task.dueDate ? `Дедлайн: ${task.dueDate} ${task.dueTime || ''}` : 'Пора выполнить задачу!'),
+            title: `[Задача] ${task.title}`,
+            body: task.description || (task.dueDate ? `Дедлайн: ${task.dueDate} ${task.dueTime || ''}` : 'Пора выполнить задачу'),
             scheduledTime,
             dueDateStr: task.dueDate,
             dueTimeStr: task.dueTime || task.startTime,
@@ -195,8 +195,8 @@ class NotificationService {
             id: `rem-habit-${habit.id}`,
             targetId: habit.id,
             type: 'habit',
-            title: `🔥 Привычка: ${habit.name}`,
-            body: `Текущий стрейк: ${habit.streak} дн. Пора зафиксировать прогресс!`,
+            title: `[Привычка] ${habit.name}`,
+            body: `Текущий стрейк: ${habit.streak} дн. Пора зафиксировать прогресс`,
             scheduledTime,
             dueTimeStr: habit.reminderTime,
             fired: false,
@@ -341,8 +341,8 @@ class NotificationService {
       navigator.vibrate([150, 80, 150]);
     }
 
-    await this.showNativeNotification('🔔 Zing OS • Проверка уведомлений', {
-      body: 'Звук и Push-уведомления успешно подключены и работают автономно в офлайн-режиме!',
+    await this.showNativeNotification('[Zenith OS] Проверка уведомлений', {
+      body: 'Звук и Push-уведомления успешно подключены и работают автономно в офлайн-режиме.',
       icon: '/icon-192.svg',
       badge: '/icon-192.svg',
       tag: 'test-notification',

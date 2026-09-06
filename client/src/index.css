@@ -1,116 +1,333 @@
 @import "tailwindcss";
 
 @theme {
-  --color-surface: #0b1326;
-  --color-surface-dim: #0b1326;
-  --color-surface-bright: #31394d;
-  --color-surface-container-lowest: #060e20;
-  --color-surface-container-low: #131b2e;
-  --color-surface-container: #171f33;
-  --color-surface-container-high: #222a3d;
-  --color-surface-container-highest: #2d3449;
-  --color-on-surface: #dae2fd;
-  --color-on-surface-variant: #bbcabf;
-  --color-outline: #86948a;
-  --color-outline-variant: #3c4a42;
-  --color-primary: #4edea3;
-  --color-primary-container: #10b981;
-  --color-on-primary: #003824;
-  --color-secondary: #d0bcff;
-  --color-secondary-container: #571bc1;
-  --color-on-secondary: #3c0091;
-  --color-tertiary: #89ceff;
-  --color-tertiary-container: #23acf1;
-  --color-error: #ffb4ab;
-  --color-error-container: #93000a;
-  --color-accent-cyan: #00e5ff;
-  --color-accent-mint: #00ffab;
-  --color-accent-gold: #e5a93c;
-  --font-mono: 'JetBrains Mono', monospace;
-  --font-display: 'Space Grotesk', 'Inter', sans-serif;
-  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --color-canvas: #0B0C0E;
+  --color-canvas-subtle: #121316;
+  --color-panel: #16171A;
+  --color-panel-hover: rgba(255, 255, 255, 0.04);
+  --color-panel-active: rgba(255, 255, 255, 0.08);
+  --color-surface-border: rgba(255, 255, 255, 0.08);
+  --color-surface-border-subtle: rgba(255, 255, 255, 0.04);
+  --color-surface-border-focus: rgba(16, 185, 129, 0.4);
+
+  --color-text-primary: #F9FAFB;
+  --color-text-secondary: #9CA3AF;
+  --color-text-muted: #6B7280;
+
+  --color-accent-emerald: #10B981;
+  --color-accent-teal: #14B8A6;
+  --color-accent-cyan: #0EA5E9;
+  --color-accent-amber: #F59E0B;
+  --color-accent-rose: #F43F5E;
+  --color-accent-graphite: #374151;
+
+  --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter", system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, monospace;
+  --font-display: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter", system-ui, sans-serif;
 }
 
 :root {
-  --bg-main: #0b1326;
-  --bg-card: #131b2e;
-  --bg-card-hover: #171f33;
-  --border-color: #222a3d;
-  --accent-cyan: #00e5ff;
-  --accent-mint: #00ffab;
-  --accent-gold: #e5a93c;
-  --accent-emerald: #4edea3;
-  --accent-purple: #d0bcff;
+  --canvas-bg: #0B0C0E;
+  --panel-bg: #16171A;
+  --panel-border: rgba(255, 255, 255, 0.08);
+  --panel-hover: rgba(255, 255, 255, 0.04);
+  --text-primary: #F9FAFB;
+  --text-secondary: #9CA3AF;
+  --text-muted: #6B7280;
+  --accent-emerald: #10B981;
+  --accent-cyan: #0EA5E9;
 }
 
-html.light {
-  --bg-main: #f8fafc;
-  --bg-card: #ffffff;
-  --bg-card-hover: #f1f5f9;
-  --border-color: #e2e8f0;
-  color-scheme: light;
+/* ==========================================================================
+   1. GLOBAL LAYOUT & SCROLLBAR RESET (LINEAR / RAYCAST ZERO-PARASITIC SCROLL)
+   ========================================================================== */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
 }
 
+html,
+body,
+#root {
+  height: 100vh;
+  height: 100dvh;
+  width: 100%;
+  width: 100vw;
+  overflow: hidden;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter", system-ui, sans-serif;
+  background-color: #0B0C0E;
+  color: #F9FAFB;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+/* Light / Dark Mode root color-schemes */
 html.dark {
   color-scheme: dark;
 }
 
-body {
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
-  min-height: 100vh;
-  margin: 0;
-  padding: 0;
-  overflow-x: hidden;
-  transition: background-color 0.2s ease, color 0.2s ease;
+html.light {
+  color-scheme: light;
+  --canvas-bg: #F8FAFC;
+  --panel-bg: #FFFFFF;
+  --panel-border: #E2E8F0;
+  --panel-hover: #F1F5F9;
+  --text-primary: #0F172A;
+  --text-secondary: #475569;
+  --text-muted: #94A3B8;
 }
 
-html.dark body {
-  background-color: #0b1326;
-  color: #dae2fd;
+/* ==========================================================================
+   2. REFINED SUBTLE SCROLLBARS (4px-6px, TRANSPARENT TRACK, SMOOTH ROUNDED)
+   ========================================================================== */
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.15) transparent;
 }
+
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 9999px;
+  border: 1px solid transparent;
+  background-clip: padding-box;
+  transition: background-color 0.15s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.28);
+}
+
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+/* Custom scrollbar utility class */
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.15) transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 9999px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.28);
+}
+
+/* ==========================================================================
+   3. LINEAR / APPLE DESIGN SYSTEM COLOR MAPPINGS (DARK MODE CANONICAL)
+   ========================================================================== */
+
+/* Main Canvas / Root Backgrounds */
+html.dark .bg-\[\#060e20\],
+html.dark .bg-\[\#0b1326\],
+html.dark .bg-\[\#050914\],
+html.dark .bg-\[\#060e20\]\/95,
+html.dark .bg-\[\#060e20\]\/90,
+html.dark .bg-\[\#0b1326\]\/95,
+html.dark .bg-\[\#0b1326\]\/90 {
+  background-color: #0B0C0E !important;
+}
+
+/* Panels, Cards & Floating Drawers */
+html.dark .bg-\[\#131b2e\],
+html.dark .bg-\[\#0d1628\],
+html.dark .bg-\[\#080e1c\],
+html.dark .bg-\[\#080d1a\],
+html.dark .bg-\[\#090e1a\]\/80 {
+  background-color: #16171A !important;
+}
+
+html.dark .bg-\[\#131b2e\]\/80,
+html.dark .bg-\[\#131b2e\]\/90,
+html.dark .bg-\[\#131b2e\]\/95,
+html.dark .bg-\[\#131b2e\]\/60 {
+  background-color: rgba(22, 23, 26, 0.92) !important;
+}
+
+/* Secondary Panels / Inner Nested Blocks */
+html.dark .bg-\[\#171f33\],
+html.dark .bg-\[\#1a233a\],
+html.dark .bg-\[\#131d33\],
+html.dark .bg-\[\#1b2332\] {
+  background-color: #1E2024 !important;
+}
+
+html.dark .bg-\[\#222a3d\] {
+  background-color: #24262C !important;
+}
+
+/* Card Hover States */
+html.dark .hover\:bg-\[\#171f33\]:hover,
+html.dark .hover\:bg-\[\#1a233a\]:hover,
+html.dark .hover\:bg-\[\#131d33\]:hover,
+html.dark .hover\:bg-\[\#222a3d\]:hover {
+  background-color: rgba(255, 255, 255, 0.05) !important;
+}
+
+/* Borders: Crisp, hairline 1px rgba(255,255,255,0.08) */
+html.dark .border-\[\#222a3d\],
+html.dark .border-\[\#1e293b\],
+html.dark .border-\[\#334155\],
+html.dark .border-\[\#222a3d\]\/50,
+html.dark .border-\[\#222a3d\]\/60,
+html.dark .border-\[\#222a3d\]\/40,
+html.dark .border-\[\#222a3d\]\/80 {
+  border-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+/* High Contrast Linear Typography */
+html.dark .text-\[\#dae2fd\] {
+  color: #F9FAFB !important;
+}
+
+html.dark .text-\[\#bbcabf\] {
+  color: #D1D5DB !important;
+}
+
+html.dark .text-\[\#86948a\] {
+  color: #9CA3AF !important;
+}
+
+/* Refined Accents: Emerald & Cyan */
+html.dark .text-\[\#00ffab\],
+html.dark .text-\[\#4edea3\] {
+  color: #10B981 !important;
+}
+
+html.dark .bg-\[\#00ffab\],
+html.dark .bg-\[\#4edea3\] {
+  background-color: #10B981 !important;
+}
+
+html.dark .border-\[\#00ffab\],
+html.dark .border-\[\#4edea3\],
+html.dark .border-\[\#00ffab\]\/30,
+html.dark .border-\[\#00ffab\]\/40,
+html.dark .border-\[\#00ffab\]\/50 {
+  border-color: rgba(16, 185, 129, 0.35) !important;
+}
+
+html.dark .text-\[\#00e5ff\],
+html.dark .text-\[\#89ceff\] {
+  color: #0EA5E9 !important;
+}
+
+html.dark .bg-\[\#00e5ff\],
+html.dark .bg-\[\#89ceff\] {
+  background-color: #0EA5E9 !important;
+}
+
+html.dark .border-\[\#00e5ff\],
+html.dark .border-\[\#89ceff\],
+html.dark .border-\[\#00e5ff\]\/30,
+html.dark .border-\[\#00e5ff\]\/40 {
+  border-color: rgba(14, 165, 233, 0.35) !important;
+}
+
+/* Amber Accents */
+html.dark .text-\[\#e5a93c\] {
+  color: #F59E0B !important;
+}
+
+html.dark .bg-\[\#e5a93c\] {
+  background-color: #F59E0B !important;
+}
+
+html.dark .border-\[\#e5a93c\] {
+  border-color: rgba(245, 158, 11, 0.35) !important;
+}
+
+/* Refined Purple/Violet: Desaturate cheap gradients */
+html.dark .text-\[\#d0bcff\] {
+  color: #A78BFA !important;
+}
+
+html.dark .border-\[\#d0bcff\]\/30,
+html.dark .border-\[\#d0bcff\] {
+  border-color: rgba(167, 139, 250, 0.25) !important;
+}
+
+/* ==========================================================================
+   4. LIGHT MODE STYLING (CLEAN APPLE / VERCEL PALETTE)
+   ========================================================================== */
 
 html.light body {
-  background-color: #f8fafc;
-  color: #0f172a;
+  background-color: #F8FAFC;
+  color: #0F172A;
 }
 
-/* Light mode overrides for structural elements */
-html.light .bg-\[\#060e20\] {
-  background-color: #f1f5f9 !important;
+html.light .bg-\[\#060e20\],
+html.light .bg-\[\#0b1326\],
+html.light .bg-\[\#050914\],
+html.light .bg-\[\#060e20\]\/95,
+html.light .bg-\[\#0b1326\]\/95 {
+  background-color: #F8FAFC !important;
 }
 
-html.light .bg-\[\#060e20\]\/90,
-html.light .bg-\[\#060e20\]\/95 {
-  background-color: rgba(248, 250, 252, 0.92) !important;
+html.light .bg-\[\#131b2e\],
+html.light .bg-\[\#0d1628\],
+html.light .bg-\[\#080e1c\],
+html.light .bg-\[\#080d1a\] {
+  background-color: #FFFFFF !important;
 }
 
-html.light .bg-\[\#0b1326\] {
-  background-color: #f8fafc !important;
-}
-
-html.light .bg-\[\#131b2e\] {
-  background-color: #ffffff !important;
-}
-
-html.light .bg-\[\#171f33\] {
-  background-color: #f1f5f9 !important;
+html.light .bg-\[\#171f33\],
+html.light .bg-\[\#1a233a\],
+html.light .bg-\[\#1b2332\] {
+  background-color: #F1F5F9 !important;
 }
 
 html.light .bg-\[\#222a3d\] {
-  background-color: #e2e8f0 !important;
+  background-color: #E2E8F0 !important;
 }
 
-html.light .border-\[\#222a3d\] {
-  border-color: #e2e8f0 !important;
+html.light .hover\:bg-\[\#171f33\]:hover,
+html.light .hover\:bg-\[\#1a233a\]:hover {
+  background-color: #F8FAFC !important;
 }
 
+html.light .border-\[\#222a3d\],
+html.light .border-\[\#1e293b\],
+html.light .border-\[\#334155\],
 html.light .border-\[\#222a3d\]\/50,
 html.light .border-\[\#222a3d\]\/60 {
-  border-color: rgba(226, 232, 240, 0.8) !important;
+  border-color: #E2E8F0 !important;
 }
 
 html.light .text-\[\#dae2fd\] {
-  color: #0f172a !important;
+  color: #0F172A !important;
 }
 
 html.light .text-\[\#bbcabf\] {
@@ -118,68 +335,200 @@ html.light .text-\[\#bbcabf\] {
 }
 
 html.light .text-\[\#86948a\] {
-  color: #64748b !important;
+  color: #64748B !important;
 }
 
-/* Custom scrollbars */
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+html.light input,
+html.light textarea,
+html.light select {
+  color: #0F172A !important;
 }
-::-webkit-scrollbar-track {
-  background: transparent;
+
+html.light * {
+  scrollbar-color: rgba(100, 116, 139, 0.25) transparent;
 }
-::-webkit-scrollbar-thumb {
-  background: rgba(134, 148, 138, 0.3);
-  border-radius: 3px;
+
+html.light ::-webkit-scrollbar-thumb {
+  background: rgba(100, 116, 139, 0.25);
 }
-::-webkit-scrollbar-thumb:hover {
-  background: rgba(134, 148, 138, 0.5);
+
+html.light ::-webkit-scrollbar-thumb:hover {
+  background: rgba(100, 116, 139, 0.4);
+}
+
+/* ==========================================================================
+   5. MICRO-UX INTERACTIONS, TACTILE FEEDBACK & MODAL ANIMATIONS
+   ========================================================================== */
+
+/* 5.1 Universal uniform icon stroke width (1.5px) */
+svg.lucide,
+svg {
+  stroke-width: 1.5px;
+}
+
+/* 5.2 Universal smooth transitions for interactive elements */
+button,
+a,
+[role="button"],
+.interactive-item {
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* 5.3 Tactile button click compression */
+button:not(:disabled):active,
+[role="button"]:not(:disabled):active {
+  transform: scale(0.98);
+}
+
+/* 5.4 Checkbox interactive feel */
+input[type="checkbox"] {
+  cursor: pointer;
+  transition: transform 0.15s ease, background-color 0.15s ease, border-color 0.15s ease;
+}
+
+input[type="checkbox"]:active {
+  transform: scale(0.92);
+}
+
+/* 5.5 Modal floating & Backdrop Keyframes */
+@keyframes modalBackdropIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes modalFloatIn {
+  from {
+    opacity: 0;
+    transform: scale(0.96) translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes sheetSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-modal-backdrop {
+  animation: modalBackdropIn 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-modal-float {
+  animation: modalFloatIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  will-change: transform, opacity;
+}
+
+.animate-sheet-slide {
+  animation: sheetSlideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  will-change: transform, opacity;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  will-change: opacity, transform;
+}
+
+/* Automatically enhance fixed modal overlays */
+.fixed.inset-0.z-50 {
+  animation: modalBackdropIn 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.fixed.inset-0.z-50 > div[class*="rounded"] {
+  animation: modalFloatIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  will-change: transform, opacity;
+}
+
+/* ==========================================================================
+   6. UTILITY STYLES FOR ZERO DEAD SPACE & GEOMETRY
+   ========================================================================== */
+
+.panel-card {
+  background-color: #16171A;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 0.75rem; /* rounded-xl = 12px */
+}
+
+html.light .panel-card {
+  background-color: #FFFFFF;
+  border-color: #E2E8F0;
+}
+
+.panel-card-hover {
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.panel-card-hover:hover {
+  background-color: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.12);
 }
 
 /* Markdown typography and inline formatting */
 .inline-markdown code {
   font-family: var(--font-mono);
   font-size: 0.85em;
-  background-color: #131b2e;
-  color: #00ffab;
+  background-color: #16171A;
+  color: #10B981;
   padding: 0.15rem 0.35rem;
   border-radius: 0.375rem;
-  border: 1px solid #222a3d;
+  border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .inline-markdown strong,
 .inline-markdown b {
   font-weight: 700;
-  color: #00ffab;
+  color: #10B981;
 }
 
 .inline-markdown em,
 .inline-markdown i {
   font-style: italic;
-  color: #89ceff;
+  color: #0EA5E9;
 }
 
 .inline-markdown a {
-  color: #00e5ff;
+  color: #0EA5E9;
   text-decoration: underline;
   text-underline-offset: 2px;
   transition: color 0.15s ease;
 }
 
 .inline-markdown a:hover {
-  color: #00ffab;
+  color: #10B981;
 }
 
-/* Syntax Highlighting theme (Highlight.js Deep Space) */
+/* Syntax Highlighting */
 .hljs {
-  color: #dae2fd;
+  color: #F9FAFB;
   background: transparent;
 }
 .hljs-keyword,
 .hljs-selector-tag,
 .hljs-subst {
-  color: #00ffab;
+  color: #10B981;
   font-weight: 600;
 }
 .hljs-string,
@@ -191,29 +540,28 @@ html.light .text-\[\#86948a\] {
 .hljs-template-variable,
 .hljs-type,
 .hljs-addition {
-  color: #89ceff;
+  color: #0EA5E9;
 }
 .hljs-comment,
 .hljs-quote,
 .hljs-deletion,
 .hljs-meta {
-  color: #86948a;
+  color: #9CA3AF;
   font-style: italic;
 }
 .hljs-number,
 .hljs-regexp,
 .hljs-link {
-  color: #e5a93c;
+  color: #F59E0B;
 }
 .hljs-variable,
 .hljs-name {
-  color: #d0bcff;
+  color: #A78BFA;
 }
 .hljs-function {
-  color: #00e5ff;
+  color: #0EA5E9;
 }
 .hljs-symbol,
 .hljs-bullet {
-  color: #ffb4ab;
+  color: #F43F5E;
 }
-

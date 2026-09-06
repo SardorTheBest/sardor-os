@@ -37,7 +37,21 @@ class SoundEngine {
     return this.enabled;
   }
 
+  public vibrate(type: 'light' | 'medium' | 'success' | 'warning' = 'light') {
+    if (typeof navigator !== 'undefined' && 'vibrate' in navigator) {
+      try {
+        if (type === 'light') navigator.vibrate(10);
+        else if (type === 'medium') navigator.vibrate(20);
+        else if (type === 'success') navigator.vibrate([15, 40, 25]);
+        else if (type === 'warning') navigator.vibrate([30, 50, 30]);
+      } catch {
+        // Safe fallback for browsers blocking vibration without user interaction
+      }
+    }
+  }
+
   public playClick() {
+    this.vibrate('light');
     if (!this.enabled) return;
     try {
       const ctx = this.getContext();
@@ -63,6 +77,7 @@ class SoundEngine {
   }
 
   public playComplete() {
+    this.vibrate('success');
     if (!this.enabled) return;
     try {
       const ctx = this.getContext();

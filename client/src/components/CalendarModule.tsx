@@ -852,11 +852,49 @@ export const CalendarModule: React.FC<CalendarModuleProps> = ({ state }) => {
 
         {/* 4. Calendar Core Display */}
         <div className={isTrayOpen ? 'lg:col-span-9' : 'lg:col-span-12'}>
+          {/* Mobile Quick Day Strip Selector */}
+          <div className="sm:hidden mb-3 p-2 rounded-2xl bg-[#131b2e] border border-[#222a3d] flex items-center justify-between gap-1 overflow-x-auto no-scrollbar">
+            {weekDays.map((col) => {
+              const isTodayCol = col.isToday;
+              const isSelected = col.dateStr === todayStr;
+              const dayTaskCount = (tasksByDate[col.dateStr] || []).length;
+              return (
+                <button
+                  key={col.dateStr}
+                  onClick={() => {
+                    sound.playClick();
+                    setCurrentDate(new Date(col.dateStr + 'T00:00:00'));
+                    setViewMode('day');
+                  }}
+                  className={`flex flex-col items-center justify-center p-2 rounded-xl min-w-[42px] transition-all ${
+                    isSelected
+                      ? 'bg-[#00ffab]/20 text-[#00ffab] border border-[#00ffab]/50'
+                      : isTodayCol
+                      ? 'bg-[#00ffab]/10 text-[#00ffab]'
+                      : 'text-[#86948a] hover:bg-[#171f33]'
+                  }`}
+                >
+                  <span className="text-[10px] font-mono uppercase font-bold">{col.dayName}</span>
+                  <span className={`text-xs font-mono font-bold mt-0.5 w-6 h-6 rounded-full flex items-center justify-center ${
+                    isTodayCol ? 'bg-[#00ffab] text-[#003824]' : 'text-[#dae2fd]'
+                  }`}>
+                    {col.dayNum}
+                  </span>
+                  {dayTaskCount > 0 && (
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#00ffab] mt-1" />
+                  )}
+                </button>
+              );
+            })}
+          </div>
+
           {/* VIEW A: WEEK VIEW (Google Calendar Time Grid with Overlaps & Resizing) */}
           {viewMode === 'week' && (
             <div className="rounded-2xl bg-[#131b2e] border border-[#222a3d] shadow-2xl overflow-hidden flex flex-col">
-              {/* Sticky Days Header */}
-              <div className="grid grid-cols-[60px_repeat(7,1fr)] border-b border-[#222a3d] bg-[#0b1326]/90 backdrop-blur sticky top-0 z-20">
+              <div className="overflow-x-auto no-scrollbar">
+                <div className="min-w-[700px] flex flex-col">
+                  {/* Sticky Days Header */}
+                  <div className="grid grid-cols-[60px_repeat(7,1fr)] border-b border-[#222a3d] bg-[#0b1326]/90 backdrop-blur sticky top-0 z-20">
                 {/* Time zone label */}
                 <div className="p-3 border-r border-[#222a3d] flex items-center justify-center text-[10px] font-mono text-[#86948a]">
                   GMT
@@ -1099,7 +1137,9 @@ export const CalendarModule: React.FC<CalendarModuleProps> = ({ state }) => {
                 </div>
               </div>
             </div>
-          )}
+          </div>
+        </div>
+      )}
 
           {/* VIEW B: DAY VIEW (High-Detail Google Calendar Timeline) */}
           {viewMode === 'day' && (
@@ -1455,16 +1495,25 @@ export const CalendarModule: React.FC<CalendarModuleProps> = ({ state }) => {
 
       {/* 5. Create Task Modal */}
       {isCreateModalOpen && (
-        <div className="fixed inset-0 bg-black/75 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="w-full max-w-lg bg-[#131b2e] border border-[#222a3d] rounded-2xl p-6 shadow-2xl space-y-4">
-            <div className="flex items-center justify-between border-b border-[#222a3d] pb-3">
+        <div 
+          className="fixed inset-0 bg-black/75 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 animate-modal-backdrop"
+          onClick={() => setIsCreateModalOpen(false)}
+        >
+          <div 
+            className="w-full max-w-lg bg-[#16171A] border border-[rgba(255,255,255,0.08)] rounded-t-2xl sm:rounded-xl p-5 sm:p-6 shadow-2xl space-y-4 animate-modal-float max-h-[90vh] overflow-y-auto pb-[max(1.25rem,env(safe-area-inset-bottom))]"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Mobile Drag Indicator */}
+            <div className="w-10 h-1 rounded-full bg-white/20 mx-auto -mt-1 mb-2 sm:hidden" />
+
+            <div className="flex items-center justify-between border-b border-[rgba(255,255,255,0.08)] pb-3">
               <h3 className="text-base font-bold text-[#dae2fd] font-display flex items-center gap-2">
                 <CalendarIcon className="w-4 h-4 text-[#00ffab]" />
                 {isRu ? `Новая задача: ${createDate}` : `Add Event: ${createDate}`}
               </h3>
               <button
                 onClick={() => setIsCreateModalOpen(false)}
-                className="text-[#86948a] hover:text-[#dae2fd]"
+                className="text-[#86948a] hover:text-[#dae2fd] p-1.5"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -1582,16 +1631,25 @@ export const CalendarModule: React.FC<CalendarModuleProps> = ({ state }) => {
 
       {/* 6. Task Details / Edit / Delete Modal */}
       {isTaskModalOpen && selectedTask && (
-        <div className="fixed inset-0 bg-black/75 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="w-full max-w-md bg-[#131b2e] border border-[#222a3d] rounded-2xl p-6 shadow-2xl space-y-4">
-            <div className="flex items-center justify-between border-b border-[#222a3d] pb-3">
-              <div className="flex items-center gap-2">
+        <div 
+          className="fixed inset-0 bg-black/75 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 animate-modal-backdrop"
+          onClick={() => setIsTaskModalOpen(false)}
+        >
+          <div 
+            className="w-full max-w-md bg-[#16171A] border border-[rgba(255,255,255,0.08)] rounded-t-2xl sm:rounded-xl p-5 sm:p-6 shadow-2xl space-y-4 animate-modal-float max-h-[90vh] overflow-y-auto pb-[max(1.25rem,env(safe-area-inset-bottom))]"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Mobile Drag Indicator */}
+            <div className="w-10 h-1 rounded-full bg-white/20 mx-auto -mt-1 mb-2 sm:hidden" />
+
+            <div className="flex items-center justify-between border-b border-[rgba(255,255,255,0.08)] pb-3">
+              <div className="flex items-center gap-2 min-w-0">
                 <button
                   onClick={() => {
                     storage.toggleTask(selectedTask.id);
                     setSelectedTask({ ...selectedTask, isCompleted: !selectedTask.isCompleted });
                   }}
-                  className="text-[#86948a] hover:text-[#00ffab]"
+                  className="text-[#86948a] hover:text-[#00ffab] flex-shrink-0"
                 >
                   {selectedTask.isCompleted ? (
                     <CheckCircle2 className="w-5 h-5 text-[#00ffab]" />
@@ -1605,7 +1663,7 @@ export const CalendarModule: React.FC<CalendarModuleProps> = ({ state }) => {
               </div>
               <button
                 onClick={() => setIsTaskModalOpen(false)}
-                className="text-[#86948a] hover:text-[#dae2fd]"
+                className="text-[#86948a] hover:text-[#dae2fd] p-1.5"
               >
                 <X className="w-5 h-5" />
               </button>
