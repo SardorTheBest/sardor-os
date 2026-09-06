@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import { AppState } from '../types';
 import { i18n } from '../lib/i18n';
+import { PWAInstallButton } from './PWAInstallButton';
 
 interface NavigationProps {
   activeView: AppState['activeView'];
@@ -153,6 +154,13 @@ export const Navigation: React.FC<NavigationProps> = ({
 
       {/* Footer: Quick Utility Icons Row & User Profile */}
       <div className="p-2.5 md:p-4 border-t border-[#222a3d]/50 space-y-3">
+        {/* PWA Install Button when expanded */}
+        {isExpanded && (
+          <div className="hidden md:block">
+            <PWAInstallButton className="w-full justify-center py-2" />
+          </div>
+        )}
+
         {/* Quick Utility Icons Row (Sound, Shortcuts, Lock) */}
         <div className={`flex items-center ${!isExpanded ? 'flex-col gap-1' : 'justify-between px-1'} text-[#86948a]`}>
           <button

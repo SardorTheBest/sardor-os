@@ -911,8 +911,17 @@ export const ProjectsModule: React.FC<ProjectsModuleProps> = ({ state, onNavigat
 
       {/* ===================== 3. CREATE / EDIT PROJECT MODAL ===================== */}
       {isEditModalOpen && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4 animate-modal-backdrop">
-          <div className="w-full max-w-lg bg-[#16171A] border border-[rgba(255,255,255,0.08)] rounded-xl p-5 md:p-6 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto animate-modal-float">
+        <div 
+          className="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 animate-modal-backdrop"
+          onClick={() => setIsEditModalOpen(false)}
+        >
+          <div 
+            className="w-full max-w-lg bg-[#16171A] border border-[rgba(255,255,255,0.08)] rounded-t-2xl sm:rounded-xl p-5 md:p-6 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto animate-modal-float pb-[max(1.25rem,env(safe-area-inset-bottom))]"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Mobile Drag Indicator */}
+            <div className="w-10 h-1 rounded-full bg-white/20 mx-auto -mt-1 mb-2 sm:hidden" />
+
             <div className="flex items-center justify-between border-b border-[rgba(255,255,255,0.08)] pb-3">
               <h3 className="text-base font-bold text-[#dae2fd] font-display flex items-center gap-2">
                 <Target className="w-4 h-4 text-[#89ceff]" />
@@ -922,7 +931,7 @@ export const ProjectsModule: React.FC<ProjectsModuleProps> = ({ state, onNavigat
               </h3>
               <button
                 onClick={() => setIsEditModalOpen(false)}
-                className="text-[#86948a] hover:text-[#dae2fd] p-1"
+                className="text-[#86948a] hover:text-[#dae2fd] p-1.5"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -1066,8 +1075,17 @@ export const ProjectsModule: React.FC<ProjectsModuleProps> = ({ state, onNavigat
 
       {/* ===================== 4. CONFIRM DELETE MODAL ===================== */}
       {projectToDelete && (
-        <div className="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-4 animate-modal-backdrop">
-          <div className="w-full max-w-md bg-[#16171A] border border-[#ffb4ab]/40 rounded-xl p-6 shadow-2xl space-y-4 animate-modal-float">
+        <div 
+          className="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 animate-modal-backdrop"
+          onClick={() => setProjectToDelete(null)}
+        >
+          <div 
+            className="w-full max-w-md bg-[#16171A] border border-[#ffb4ab]/40 rounded-t-2xl sm:rounded-xl p-5 sm:p-6 shadow-2xl space-y-4 animate-modal-float pb-[max(1.25rem,env(safe-area-inset-bottom))]"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Mobile Drag Indicator */}
+            <div className="w-10 h-1 rounded-full bg-white/20 mx-auto -mt-1 mb-2 sm:hidden" />
+
             <div className="flex items-center gap-3 text-[#ffb4ab]">
               <div className="w-10 h-10 rounded-xl bg-[#ffb4ab]/10 border border-[#ffb4ab]/30 flex items-center justify-center flex-shrink-0">
                 <AlertTriangle className="w-5 h-5 text-[#ffb4ab]" />
@@ -1107,18 +1125,18 @@ export const ProjectsModule: React.FC<ProjectsModuleProps> = ({ state, onNavigat
               </p>
             </div>
 
-            <div className="flex justify-end gap-2.5 pt-2">
+            <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-2.5 pt-2">
               <button
                 type="button"
                 onClick={() => setProjectToDelete(null)}
-                className="px-4 py-2.5 rounded-xl text-xs font-mono text-[#bbcabf] hover:bg-[#1e293b] transition-colors"
+                className="w-full sm:w-auto px-4 py-2.5 rounded-xl text-xs font-mono text-[#bbcabf] hover:bg-[#1e293b] transition-colors min-h-[44px] flex items-center justify-center"
               >
                 {isRu ? 'Отмена' : 'Cancel'}
               </button>
               <button
                 type="button"
                 onClick={handleConfirmDelete}
-                className="px-4 py-2.5 bg-[#ba1a1a] hover:bg-[#ba1a1a]/90 text-white font-mono text-xs font-bold rounded-xl flex items-center gap-2 shadow-lg shadow-[#ba1a1a]/30 transition-all"
+                className="w-full sm:w-auto px-4 py-2.5 bg-[#ba1a1a] hover:bg-[#ba1a1a]/90 text-white font-mono text-xs font-bold rounded-xl flex items-center justify-center gap-2 shadow-lg shadow-[#ba1a1a]/30 transition-all min-h-[44px]"
               >
                 <Trash2 className="w-4 h-4" />
                 <span>{isRu ? 'Удалить проект и задачи' : 'Delete Project & Tasks'}</span>

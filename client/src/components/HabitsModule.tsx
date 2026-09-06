@@ -308,8 +308,17 @@ export const HabitsModule: React.FC<HabitsModuleProps> = ({ state }) => {
 
       {/* Habit Create / Edit Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 bg-black/75 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-modal-backdrop">
-          <div className="w-full max-w-md bg-[#16171A] border border-[rgba(255,255,255,0.08)] rounded-xl p-6 shadow-2xl space-y-4 animate-modal-float">
+        <div 
+          className="fixed inset-0 bg-black/75 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 animate-modal-backdrop"
+          onClick={() => setIsModalOpen(false)}
+        >
+          <div 
+            className="w-full max-w-md bg-[#16171A] border border-[rgba(255,255,255,0.08)] rounded-t-2xl sm:rounded-xl p-5 sm:p-6 shadow-2xl space-y-4 animate-modal-float max-h-[90vh] overflow-y-auto pb-[max(1.25rem,env(safe-area-inset-bottom))]"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Mobile Drag Indicator */}
+            <div className="w-10 h-1 rounded-full bg-white/20 mx-auto -mt-1 mb-2 sm:hidden" />
+
             <div className="flex items-center justify-between border-b border-[rgba(255,255,255,0.08)] pb-3">
               <h3 className="text-base font-bold text-[#dae2fd] font-display flex items-center gap-2">
                 <Flame className="w-5 h-5 text-[#e5a93c]" />
@@ -317,7 +326,7 @@ export const HabitsModule: React.FC<HabitsModuleProps> = ({ state }) => {
               </h3>
               <button
                 onClick={() => setIsModalOpen(false)}
-                className="text-[#86948a] hover:text-[#dae2fd]"
+                className="text-[#86948a] hover:text-[#dae2fd] p-1.5"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -438,17 +447,17 @@ export const HabitsModule: React.FC<HabitsModuleProps> = ({ state }) => {
                 )}
               </div>
 
-              <div className="flex justify-end gap-2 pt-3 border-t border-[#222a3d]">
+              <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-2 pt-3 border-t border-[#222a3d]">
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}
-                  className="px-4 py-2 rounded-xl text-xs font-mono text-[#86948a] hover:bg-[#222a3d]"
+                  className="w-full sm:w-auto px-4 py-2.5 rounded-xl text-xs font-mono text-[#86948a] hover:bg-[#222a3d] min-h-[44px] flex items-center justify-center"
                 >
                   {isRu ? 'Отмена' : 'Cancel'}
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-[#4edea3] hover:bg-[#10b981] text-[#003824] font-mono text-xs font-semibold rounded-xl shadow-md shadow-[#4edea3]/20 transition-all"
+                  className="w-full sm:w-auto px-5 py-2.5 bg-[#4edea3] hover:bg-[#10b981] text-[#003824] font-mono text-xs font-semibold rounded-xl shadow-md shadow-[#4edea3]/20 transition-all min-h-[44px] flex items-center justify-center"
                 >
                   {editingHabit ? (isRu ? 'Сохранить' : 'Save Changes') : (isRu ? 'Создать привычку' : 'Create Habit')}
                 </button>

@@ -26,6 +26,7 @@ import { storage } from '../lib/storage';
 import { notificationService } from '../lib/notificationService';
 import { TaskProductivityChart } from './TaskProductivityChart';
 import { EmptyState } from './EmptyState';
+import { SwipeableTaskItem } from './SwipeableTaskItem';
 
 interface TasksModuleProps {
   state: AppState;
@@ -363,130 +364,14 @@ export const TasksModule: React.FC<TasksModuleProps> = ({
           filteredTasks.map((task) => {
             const tag = getTag(task.tagId);
             return (
-              <div
+              <SwipeableTaskItem
                 key={task.id}
-                className={`group flex items-start sm:items-center justify-between p-4 rounded-2xl border transition-all duration-150 gap-3 ${
-                  task.isCompleted
-                    ? 'bg-[#0b1326]/40 border-[#222a3d]/40 opacity-60'
-                    : 'bg-[#131b2e] hover:bg-[#171f33] border-[#222a3d] hover:border-[#3c4a42] shadow-sm'
-                }`}
-              >
-                <div className="flex items-start sm:items-center gap-3.5 min-w-0 flex-1">
-                  <button
-                    onClick={() => storage.toggleTask(task.id)}
-                    className="mt-0.5 sm:mt-0 text-[#86948a] hover:text-[#4edea3] transition-colors flex-shrink-0"
-                  >
-                    {task.isCompleted ? (
-                      <CheckCircle2 className="w-5 h-5 text-[#4edea3]" />
-                    ) : (
-                      <Circle className="w-5 h-5 text-[#86948a] group-hover:text-[#4edea3]" />
-                    )}
-                  </button>
-
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-center gap-2">
-                      <span
-                        className={`text-sm font-semibold truncate ${
-                          task.isCompleted ? 'line-through text-[#86948a]' : 'text-[#dae2fd]'
-                        }`}
-                      >
-                        {task.title}
-                      </span>
-                    </div>
-
-                    {task.description && (
-                      <p className="text-xs text-[#bbcabf] mt-1 line-clamp-1">
-                        {task.description}
-                      </p>
-                    )}
-
-                    <div className="flex flex-wrap items-center gap-2 mt-2">
-                      {task.dueDate && (
-                        <span className="text-[11px] font-mono text-[#86948a] flex items-center gap-1 bg-[#0b1326] px-2 py-0.5 rounded border border-[#222a3d]">
-                          <Calendar className="w-3 h-3 text-[#89ceff]" />
-                          {task.dueDate} {task.dueTime && `@ ${task.dueTime}`}
-                        </span>
-                      )}
-
-                      {tag && (
-                        <span
-                          className="text-[10px] font-mono px-2 py-0.5 rounded border"
-                          style={{
-                            backgroundColor: `${tag.color}15`,
-                            borderColor: `${tag.color}35`,
-                            color: tag.color,
-                          }}
-                        >
-                          {tag.name}
-                        </span>
-                      )}
-
-                      <span
-                        className={`text-[10px] font-mono uppercase px-2 py-0.5 rounded border ${
-                          task.priority === 'high'
-                            ? 'bg-[#ffb4ab]/10 text-[#ffb4ab] border-[#ffb4ab]/30'
-                            : task.priority === 'medium'
-                            ? 'bg-[#e5a93c]/10 text-[#e5a93c] border-[#e5a93c]/30'
-                            : 'bg-[#89ceff]/10 text-[#89ceff] border-[#89ceff]/30'
-                        }`}
-                      >
-                        {task.priority === 'high'
-                          ? isRu
-                            ? 'Высокий'
-                            : 'High'
-                          : task.priority === 'medium'
-                          ? isRu
-                            ? 'Средний'
-                            : 'Medium'
-                          : isRu
-                          ? 'Низкий'
-                          : 'Low'}
-                      </span>
-
-                      {task.reminderEnabled && (
-                        <span
-                          title={task.reminderDateTime ? `Напоминание: ${task.reminderDateTime}` : 'Напоминание активно'}
-                          className="text-[10px] font-mono px-2 py-0.5 rounded bg-[#00ffab]/10 border border-[#00ffab]/30 text-[#00ffab] flex items-center gap-1 shadow-xs"
-                        >
-                          <BellRing className="w-3 h-3 text-[#00ffab] animate-pulse" />
-                          <span>
-                            {task.reminderDateTime
-                              ? `${isRu ? 'Напомнить ' : 'Alert '}${task.reminderDateTime.replace('T', ' ')}`
-                              : isRu
-                              ? 'Напоминание вкл.'
-                              : 'Reminder on'}
-                          </span>
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-1 opacity-80 group-hover:opacity-100 transition-opacity">
-                  {onOpenDeepWork && !task.isCompleted && (
-                    <button
-                      onClick={() => onOpenDeepWork(task)}
-                      title={isRu ? 'Режим Погружения (Deep Work Zen)' : 'Deep Work Zen Focus'}
-                      className="p-1.5 rounded-lg text-[#00ffab] hover:bg-[#00ffab]/10 border border-[#00ffab]/20 transition-colors flex items-center gap-1 text-[11px] font-mono"
-                    >
-                      <Sparkles className="w-3.5 h-3.5 text-[#00ffab] animate-pulse" />
-                      <span className="hidden xl:inline">{isRu ? 'Фокус' : 'Focus'}</span>
-                    </button>
-                  )}
-                  <button
-                    onClick={() => openEditModal(task)}
-                    className="p-1.5 rounded-lg text-[#86948a] hover:text-[#dae2fd] hover:bg-[#222a3d] transition-colors"
-                  >
-                    <Edit3 className="w-4 h-4" />
-                  </button>
-                  <button
-                    onClick={() => storage.deleteTask(task.id)}
-                    className="p-1.5 rounded-lg text-[#86948a] hover:text-[#ffb4ab] hover:bg-[#222a3d] transition-colors"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
-                </div>
-              </div>
+                task={task}
+                tag={tag}
+                isRu={isRu}
+                onOpenDeepWork={onOpenDeepWork}
+                openEditModal={openEditModal}
+              />
             );
           })
         )}

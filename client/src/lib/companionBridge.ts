@@ -247,16 +247,41 @@ class CompanionBridgeService {
             return;
           }
         }
+        
         this.log('system', 'PEER_ERROR', `Ошибка WebRTC: ${err.message || err.type || err}`);
-        console.warn('[PeerJS] Error:', err);
+        console.warn('[PeerJS] Non-fatal WebRTC error:', err?.type || err?.message || err);
+
+        // Schedule auto-reconnect on network/server connection errors
+        if (['network', 'server-error', 'socket-error', 'socket-closed'].includes(err?.type)) {
+          if (!this.reconnectTimer) {
+            this.reconnectTimer = setTimeout(() => {
+              this.reconnectTimer = null;
+              if (this.peer && !this.peer.destroyed && this.peer.disconnected) {
+                try {
+                  this.peer.reconnect();
+                } catch (e) {
+                  this.initPeerJS(this.isHost ? 'host' : 'companion');
+                }
+              }
+            }, 5000);
+          }
+        }
       });
 
       this.peer.on('disconnected', () => {
         this.log('system', 'PEER_DISCONNECTED', 'Сигнальный сервер PeerJS отключился, попытка переподключения...');
         try {
-          this.peer?.reconnect();
+          if (this.peer && !this.peer.destroyed) {
+            this.peer.reconnect();
+          }
         } catch (e) {
-          // Ignored
+          // If reconnect fails immediately, schedule a delayed re-initialization
+          if (!this.reconnectTimer) {
+            this.reconnectTimer = setTimeout(() => {
+              this.reconnectTimer = null;
+              this.initPeerJS(this.isHost ? 'host' : 'companion');
+            }, 5000);
+          }
         }
       });
     } catch (err) {

@@ -25,6 +25,7 @@ import { EveningReviewModal } from './components/EveningReviewModal';
 import { SplitViewWorkspace } from './components/SplitViewWorkspace';
 import { StandByView } from './components/StandByView';
 import { DevicePairingModal } from './components/DevicePairingModal';
+import { OfflineIndicator } from './components/OfflineIndicator';
 import { syncService, SyncState } from './lib/supabaseSync';
 import { companionBridge, CompanionMessage } from './lib/companionBridge';
 import { notificationService } from './lib/notificationService';
@@ -604,6 +605,9 @@ export function App() {
           )}
         </div>
       )}
+
+      {/* Offline Status Indicator */}
+      <OfflineIndicator />
     </AppLayout>
   );
 }

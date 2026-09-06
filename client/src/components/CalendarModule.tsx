@@ -227,6 +227,7 @@ export const CalendarModule: React.FC<CalendarModuleProps> = ({ state }) => {
   const [createDescription, setCreateDescription] = useState('');
   const [createPriority, setCreatePriority] = useState<Priority>('medium');
   const [createTagId, setCreateTagId] = useState(state.tags[0]?.id || '');
+  const [createIsAllDay, setCreateIsAllDay] = useState(false);
 
   // Month view more tasks modal
   const [moreTasksDate, setMoreTasksDate] = useState<string | null>(null);
@@ -603,6 +604,7 @@ export const CalendarModule: React.FC<CalendarModuleProps> = ({ state }) => {
     setCreateDescription('');
     setCreatePriority('medium');
     setCreateTagId(state.tags[0]?.id || '');
+    setCreateIsAllDay(false);
     setIsCreateModalOpen(true);
   };
 
@@ -619,9 +621,9 @@ export const CalendarModule: React.FC<CalendarModuleProps> = ({ state }) => {
       title: createTitle.trim(),
       description: createDescription.trim() || undefined,
       dueDate: createDate,
-      dueTime: createStartTime,
-      startTime: createStartTime,
-      endTime: end,
+      dueTime: createIsAllDay ? undefined : createStartTime,
+      startTime: createIsAllDay ? undefined : createStartTime,
+      endTime: createIsAllDay ? undefined : end,
       priority: createPriority,
       tagId: createTagId || undefined,
       isCompleted: false,
@@ -931,6 +933,42 @@ export const CalendarModule: React.FC<CalendarModuleProps> = ({ state }) => {
                           </span>
                         )}
                       </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* All-Day Tasks Section */}
+              <div className="grid grid-cols-[60px_repeat(7,1fr)] border-b border-[#222a3d] bg-[#0b1326]/60 text-xs">
+                <div className="p-2 border-r border-[#222a3d] flex items-center justify-center text-[9px] font-mono text-[#86948a] uppercase text-center leading-tight">
+                  {isRu ? 'Весь день' : 'All Day'}
+                </div>
+                {weekDays.map((col) => {
+                  const dayTasks = tasksByDate[col.dateStr] || [];
+                  const allDayTasks = dayTasks.filter((t) => !t.startTime && !t.dueTime);
+
+                  return (
+                    <div
+                      key={`allday-${col.dateStr}`}
+                      className="p-1 border-r border-[#222a3d] last:border-r-0 min-h-[36px] flex flex-col gap-1 overflow-y-auto max-h-[80px]"
+                    >
+                      {allDayTasks.map((t) => {
+                        const tag = getTag(t.tagId);
+                        return (
+                          <div
+                            key={t.id}
+                            onClick={() => handleOpenTaskDetails(t)}
+                            className="px-2 py-0.5 rounded bg-[#171f33] border border-[#222a3d] hover:border-[#00ffab] text-[10px] text-[#dae2fd] truncate cursor-pointer font-medium flex items-center gap-1 shadow-xs"
+                            style={{
+                              borderLeftWidth: '3px',
+                              borderLeftColor: tag?.color || '#00ffab',
+                            }}
+                            title={t.title}
+                          >
+                            <span className="truncate">{t.title}</span>
+                          </div>
+                        );
+                      })}
                     </div>
                   );
                 })}
@@ -1547,32 +1585,46 @@ export const CalendarModule: React.FC<CalendarModuleProps> = ({ state }) => {
                 />
               </div>
 
-              {/* Time Span Inputs (Start & End Time) */}
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-xs font-mono text-[#86948a] mb-1">
-                    {isRu ? 'ВРЕМЯ НАЧАЛА' : 'START TIME'}
-                  </label>
+              {/* All Day Checkbox & Time Span Inputs */}
+              <div className="space-y-2">
+                <label className="flex items-center gap-2 cursor-pointer select-none text-xs text-[#dae2fd] font-mono">
                   <input
-                    type="time"
-                    required
-                    value={createStartTime}
-                    onChange={(e) => setCreateStartTime(e.target.value)}
-                    className="w-full bg-[#0b1326] border border-[#222a3d] rounded-xl px-3 py-2 text-xs text-[#dae2fd] focus:outline-none focus:border-[#00ffab]"
+                    type="checkbox"
+                    checked={createIsAllDay}
+                    onChange={(e) => setCreateIsAllDay(e.target.checked)}
+                    className="w-4 h-4 rounded border-[#222a3d] bg-[#0b1326] text-[#00ffab] focus:ring-[#00ffab]"
                   />
-                </div>
-                <div>
-                  <label className="block text-xs font-mono text-[#86948a] mb-1">
-                    {isRu ? 'ВРЕМЯ ОКОНЧАНИЯ' : 'END TIME'}
-                  </label>
-                  <input
-                    type="time"
-                    required
-                    value={createEndTime}
-                    onChange={(e) => setCreateEndTime(e.target.value)}
-                    className="w-full bg-[#0b1326] border border-[#222a3d] rounded-xl px-3 py-2 text-xs text-[#dae2fd] focus:outline-none focus:border-[#00ffab]"
-                  />
-                </div>
+                  <span>{isRu ? 'Весь день / Без точного времени' : 'All Day / Untimed Task'}</span>
+                </label>
+
+                {!createIsAllDay && (
+                  <div className="grid grid-cols-2 gap-3 pt-1">
+                    <div>
+                      <label className="block text-xs font-mono text-[#86948a] mb-1">
+                        {isRu ? 'ВРЕМЯ НАЧАЛА' : 'START TIME'}
+                      </label>
+                      <input
+                        type="time"
+                        required={!createIsAllDay}
+                        value={createStartTime}
+                        onChange={(e) => setCreateStartTime(e.target.value)}
+                        className="w-full bg-[#0b1326] border border-[#222a3d] rounded-xl px-3 py-2 text-xs text-[#dae2fd] focus:outline-none focus:border-[#00ffab]"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-mono text-[#86948a] mb-1">
+                        {isRu ? 'ВРЕМЯ ОКОНЧАНИЯ' : 'END TIME'}
+                      </label>
+                      <input
+                        type="time"
+                        required={!createIsAllDay}
+                        value={createEndTime}
+                        onChange={(e) => setCreateEndTime(e.target.value)}
+                        className="w-full bg-[#0b1326] border border-[#222a3d] rounded-xl px-3 py-2 text-xs text-[#dae2fd] focus:outline-none focus:border-[#00ffab]"
+                      />
+                    </div>
+                  </div>
+                )}
               </div>
 
               <div className="grid grid-cols-2 gap-3">
